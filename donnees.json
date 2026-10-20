@@ -89,13 +89,13 @@
   "agenda": [],
   "annonce": {
     "texte": "test annonce",
-    "actif": false,
+    "actif": true,
     "type": "info",
     "jusqu": ""
   },
   "legal": {
-    "president": "",
-    "rna": "",
+    "president": "Phara Prom Kong / Alex Thmaour",
+    "rna": "W261006762",
     "siret": ""
   },
   "galerie": []
