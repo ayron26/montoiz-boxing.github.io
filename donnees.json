@@ -24,7 +24,7 @@
       "cours": "Boxe thaï & khmère enfants",
       "public": "Enfants",
       "coach": "",
-      "exemple": true
+      "exemple": false
     },
     {
       "id": "p4",
@@ -34,7 +34,7 @@
       "cours": "Adultes tous niveaux",
       "public": "Adultes",
       "coach": "",
-      "exemple": true
+      "exemple": false
     },
     {
       "id": "kao17h3",
@@ -89,13 +89,13 @@
   "agenda": [],
   "annonce": {
     "texte": "test annonce",
-    "actif": true,
+    "actif": false,
     "type": "info",
     "jusqu": ""
   },
   "legal": {
-    "president": "Phara Prom Kong / Alex Thmaour",
-    "rna": "W261006762",
+    "president": "",
+    "rna": "",
     "siret": ""
   },
   "galerie": []
