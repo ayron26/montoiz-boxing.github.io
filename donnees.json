@@ -85,5 +85,18 @@
       "texte": "Décision prise à l’unanimité du bureau lors d’une assemblée générale extraordinaire. Un immense merci à la mairie de Montoison, qui met gracieusement à notre disposition un lieu dédié à notre sport. Une nouvelle identité, un nouveau lieu, une nouvelle aventure."
     }
   ],
-  "coachs": []
+  "coachs": [],
+  "agenda": [],
+  "annonce": {
+    "texte": "test annonce",
+    "actif": true,
+    "type": "info",
+    "jusqu": ""
+  },
+  "legal": {
+    "president": "",
+    "rna": "",
+    "siret": ""
+  },
+  "galerie": []
 }
