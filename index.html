@@ -201,6 +201,44 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;max-width:calc(100% - 32px)}
 .confirm{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--red)}
 @media (max-width:600px){.fgrid{grid-template-columns:1fr}}
+/* Demande */
+.ask{margin-top:28px;display:grid;grid-template-columns:1fr 1.6fr;gap:28px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:24px;scroll-margin-top:80px}
+.ask h3{font-size:clamp(30px,4vw,42px);font-weight:800;margin:8px 0 12px}
+.ask .side p{color:var(--muted);margin:0 0 10px;font-size:15px}
+.ask form{display:flex;flex-direction:column;gap:12px;min-width:0}
+.types{display:flex;flex-wrap:wrap;gap:8px}
+.types label{cursor:pointer}
+.types input{position:absolute;opacity:0;pointer-events:none}
+.types span{display:inline-block;font-family:var(--f-label);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;padding:7px 14px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.types input:checked + span{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.types input:focus-visible + span{outline:2px solid var(--gold-2);outline-offset:2px}
+.form-err{color:#f5b0a8;font-size:14px;margin:0}
+.form-ok{border:1px solid var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);border-radius:var(--r);padding:18px}
+.form-ok b{display:block;font-family:var(--f-display);font-size:26px;text-transform:uppercase;margin-bottom:6px}
+.try{all:unset;cursor:pointer;font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-2);border-bottom:1px solid currentColor;margin-left:auto}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+@media (max-width:860px){.ask{grid-template-columns:1fr;padding:18px}}
+/* Photos */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.gallery figure{margin:0;position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--bg-3)}
+.gallery button{all:unset;display:block;cursor:pointer;width:100%}
+.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;transition:transform .3s}
+.gallery button:hover img{transform:scale(1.04)}
+.gallery figcaption{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#f3ece0;font-size:14px;font-weight:600}
+.post .ph{margin:-20px -20px 4px;aspect-ratio:16/9;overflow:hidden;border-radius:var(--r) var(--r) 0 0;background:var(--bg-3)}
+.post .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.coach-card .avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin-bottom:10px;display:block}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:80vh;border-radius:8px;object-fit:contain}
+.lightbox p{color:#f3ece0;margin:0;text-align:center}
+.photo-pick{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.photo-pick img{width:96px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.photo-pick .none{width:96px;height:72px;border-radius:6px;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px}
+.file-btn{position:relative;overflow:hidden}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.gal-item{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
+.gal-item img{width:120px;aspect-ratio:4/3;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+@media (max-width:480px){.gal-item{grid-template-columns:1fr}.gal-item img{width:100%}}
 </style>
 </head>
 <body>
@@ -226,6 +264,64 @@ const waHref=t=>{let n=String(t).replace(/\D/g,"");if(n.startsWith("0"))n="33"+n
 const mapHref=c=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c.adresse+" "+c.ville);
 const initials=n=>String(n||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
+const TYPES=[["essai","Cours d’essai"],["inscription","Inscription"],["info","Renseignement"],["partenariat","Partenariat / sponsor"],["autre","Autre"]];
+const FORM={type:"essai",nom:"",tel:"",email:"",pour:"Moi (adulte)",age:"",cours:"",message:"",ok:false,status:"idle",err:""};
+function formText(){
+  const t=TYPES.find(x=>x[0]===FORM.type)[1];
+  return `Demande : ${t}\nNom : ${FORM.nom}\nTéléphone : ${FORM.tel}\nE-mail : ${FORM.email}\nPour : ${FORM.pour}${FORM.age?" ("+FORM.age+" ans)":""}${FORM.cours?"\nCours : "+FORM.cours:""}\n\n${FORM.message}`;
+}
+function formHTML(D){
+  const c=D.club;
+  const cours=[...new Set(D.planning.map(s=>s.cours).filter(Boolean))];
+  const waText=encodeURIComponent("Bonjour, "+formText());
+  const fallback=`<p class="help" style="margin:0">Vous pouvez aussi écrire directement au club : <a href="${waHref(c.whatsapp||c.tel)}?text=${waText}" target="_blank" rel="noopener">par WhatsApp</a> ou à ${esc(c.email)}.</p>`;
+  if(FORM.status==="sent") return `<div class="ask" id="demande"><div class="side"><div class="eyebrow">Demande envoyée</div><h3>Merci ${esc(FORM.nom.split(" ")[0])} !</h3></div>
+    <div class="form-ok"><b>C’est bien reçu</b>Le club vous recontacte rapidement au ${esc(FORM.tel||FORM.email)}. Pour un cours d’essai, prévoyez une tenue de sport et une bouteille d’eau.<div style="margin-top:14px"><button class="btn ghost sm" id="form-new">Faire une autre demande</button></div></div></div>`;
+  return `<div class="ask" id="demande">
+  <div class="side"><div class="eyebrow">Écrire au club</div><h3>Une question,<br>un cours d’essai ?</h3>
+    <p>Remplissez ce formulaire : votre demande arrive directement par e-mail au bureau du club, qui vous recontacte.</p>
+    <p>Pour un premier cours, une tenue de sport et une bouteille d’eau suffisent.</p></div>
+  <form id="ask-form" novalidate>
+    <div class="types" role="radiogroup" aria-label="Type de demande">${TYPES.map(([v,l])=>`<label><input type="radio" name="type" value="${v}" data-form="type"${FORM.type===v?" checked":""}><span>${l}</span></label>`).join("")}</div>
+    <div class="fgrid">
+      <label class="f" for="fm-nom">Nom et prénom *<input id="fm-nom" data-form="nom" value="${esc(FORM.nom)}" autocomplete="name" required></label>
+      <label class="f" for="fm-tel">Téléphone<input id="fm-tel" data-form="tel" type="tel" value="${esc(FORM.tel)}" autocomplete="tel" inputmode="tel"></label>
+      <label class="f" for="fm-email">E-mail<input id="fm-email" data-form="email" type="email" value="${esc(FORM.email)}" autocomplete="email"></label>
+      ${FORM.type==="essai"||FORM.type==="inscription"?`
+      <label class="f" for="fm-pour">Pour qui ?<select id="fm-pour" data-form="pour">${["Moi (adulte)","Mon enfant","Plusieurs personnes"].map(o=>`<option${FORM.pour===o?" selected":""}>${o}</option>`).join("")}</select></label>
+      ${FORM.pour!=="Moi (adulte)"?`<label class="f" for="fm-age">Âge de l’enfant<input id="fm-age" data-form="age" inputmode="numeric" value="${esc(FORM.age)}" placeholder="ex. 9"></label>`:""}
+      ${cours.length?`<label class="f${FORM.pour!=="Moi (adulte)"?"":" "}" for="fm-cours">Cours souhaité<select id="fm-cours" data-form="cours"><option value="">Je ne sais pas encore</option>${cours.map(o=>`<option${FORM.cours===o?" selected":""}>${esc(o)}</option>`).join("")}</select></label>`:""}`:""}
+      <label class="f full" for="fm-msg">Message${FORM.type==="essai"?" (facultatif)":""}<textarea id="fm-msg" data-form="message" placeholder="${FORM.type==="partenariat"?"Présentez votre entreprise et votre proposition…":"Votre niveau, vos disponibilités, vos questions…"}">${esc(FORM.message)}</textarea></label>
+      <label class="f inline full" for="fm-ok"><input type="checkbox" id="fm-ok" data-form="ok"${FORM.ok?" checked":""}>J’accepte que le club utilise ces informations pour me recontacter. *</label>
+    </div>
+    <div class="hp" aria-hidden="true"><label>Ne pas remplir<input id="fm-hp" name="_honey" tabindex="-1" autocomplete="off"></label></div>
+    ${FORM.err?`<p class="form-err" role="alert">${esc(FORM.err)}</p>`:""}
+    <div class="cta"><button class="btn" type="submit" ${FORM.status==="sending"?"disabled":""}>${FORM.status==="sending"?"Envoi…":"Envoyer la demande"}</button></div>
+    ${fallback}
+  </form></div>`;
+}
+async function sendForm(){
+  FORM.err="";
+  if(!FORM.nom.trim()) FORM.err="Indiquez votre nom.";
+  else if(!FORM.tel.trim()&&!/^\S+@\S+\.\S+$/.test(FORM.email)) FORM.err="Indiquez un téléphone ou un e-mail valide pour que le club puisse vous répondre.";
+  else if(!FORM.ok) FORM.err="Cochez la case d’accord pour que le club puisse vous recontacter.";
+  if(FORM.err){refreshForm();return}
+  if(document.getElementById("fm-hp")?.value) return;
+  FORM.status="sending";refreshForm();
+  const to=DATA.club.formEmail||DATA.club.email;
+  const t=TYPES.find(x=>x[0]===FORM.type)[1];
+  try{
+    const r=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(to),{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body:JSON.stringify({_subject:`[Site] ${t} – ${FORM.nom}`,_template:"table",_captcha:"false",...(FORM.email?{_replyto:FORM.email}:{}),"Type de demande":t,"Nom":FORM.nom,"Téléphone":FORM.tel,"E-mail":FORM.email,"Pour":FORM.type==="essai"||FORM.type==="inscription"?FORM.pour+(FORM.age?` (${FORM.age} ans)`:""):"","Cours souhaité":FORM.cours,"Message":FORM.message})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&String(j.success)==="true"){FORM.status="sent"}
+    else{FORM.status="idle";FORM.err="La demande n’a pas pu être envoyée pour le moment. Utilisez WhatsApp ou l’e-mail ci-dessous.";}
+  }catch(_){FORM.status="idle";FORM.err="Pas de connexion. Réessayez, ou utilisez WhatsApp ou l’e-mail ci-dessous.";}
+  refreshForm();
+}
+function refreshForm(){const el=document.getElementById("demande");if(!el)return;const tmp=document.createElement("div");tmp.innerHTML=formHTML(DATA);el.replaceWith(tmp.firstElementChild)}
+function goForm(type,cours){FORM.type=type;if(cours!==undefined)FORM.cours=cours;if(FORM.status==="sent")FORM.status="idle";refreshForm();document.getElementById("demande")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});setTimeout(()=>document.getElementById("fm-nom")?.focus({preventScroll:true}),400)}
+
 function render(){
   const D=DATA, c=D.club;
   const sessions=[...D.planning].sort((a,b)=>a.jour-b.jour||a.debut.localeCompare(b.debut));
@@ -240,7 +336,7 @@ function render(){
 <header class="top"><div class="wrap">
   <a class="brand" href="#accueil"><img src="${IMG.logo}" alt=""><span>${esc(c.nom)}</span></a>
   <nav class="links" aria-label="Sections">
-    <a href="#club">Le club</a><a href="#planning">Planning</a><a href="#tarifs">Inscription</a><a href="#actus">Actus</a><a href="#contact">Contact</a>
+    <a href="#club">Le club</a><a href="#planning">Planning</a><a href="#tarifs">Inscription</a><a href="#actus">Actus</a>${(D.galerie||[]).length?'<a href="#photos">Photos</a>':""}<a href="#contact">Contact</a>
   </nav>
 </div></header>
 <div class="mongkol" aria-hidden="true"></div>
@@ -250,7 +346,7 @@ function render(){
     <div class="eyebrow">Association sportive · ${esc(c.ville)}</div>
     <h1>Montoiz’<br><em>Thaï Khmer</em><br>Boxing</h1>
     <p class="lead">${esc(c.accroche)}</p>
-    <div class="cta"><a class="btn" href="#planning">Voir les horaires</a><a class="btn ghost" href="#contact">Nous contacter</a></div>
+    <div class="cta"><a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a><a class="btn ghost" href="#planning">Voir les horaires</a></div>
     <div class="tags"><span class="tag">Muay Thaï</span><span class="tag">Kun Khmer</span><span class="tag">Boxe d’Asie du Sud-Est</span><span class="tag">Enfants &amp; adultes</span></div>
   </div>
   <img class="logo-big" src="${IMG.logo}" alt="Logo Montoiz’ Thaï Khmer Boxing : tigre coiffé des tours d’Angkor, 26800">
@@ -277,7 +373,7 @@ function render(){
   ${hasEx?`<div class="notice"><span>⚠</span><span><b>Horaires indicatifs.</b> Les créneaux marqués « à confirmer » ne sont pas encore définitifs. Appelez le club avant votre premier cours.</span></div>`:""}
   ${days.length?`<div class="week">${days.map(d=>`<div class="day${d===t?" today":""}"><h3>${JOURS[d]}${d===t?"<small>Aujourd’hui</small>":""}</h3>${shown.filter(s=>s.jour===d).map(s=>`
     <div class="sess"><div class="t">${esc(s.debut)} – ${esc(s.fin)}</div><div class="c">${esc(s.cours)}</div>
-    <div class="m"><span class="pub" data-p="${esc(s.public)}">${esc(s.public)}</span>${s.exemple?'<span class="ex">à confirmer</span>':""}</div>
+    <div class="m"><span class="pub" data-p="${esc(s.public)}">${esc(s.public)}</span>${s.exemple?'<span class="ex">à confirmer</span>':""}<button class="try" data-try="${esc(s.id)}">Essayer</button></div>
     ${s.coach?`<div class="coach">Avec ${esc(s.coach)}</div>`:""}</div>`).join("")}</div>`).join("")}</div>`
   :`<div class="empty"><b>Planning en préparation</b>Les horaires de la saison arrivent. En attendant, contactez le club au ${esc(c.tel)}.</div>`}
 </div></section>
@@ -294,12 +390,16 @@ function render(){
 
 <section class="band alt" id="actus"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">La vie du club</div><h2>Actualités</h2></div><p>Galas, stages, événements et nouvelles de l’association.</p></div>
-  ${actus.length?`<div class="news">${actus.map(a=>`<article class="post"><time datetime="${esc(a.date)}">${esc(fmtDate(a.date))}</time><h3>${esc(a.titre)}</h3><p>${esc(a.texte)}</p></article>`).join("")}</div>`:`<div class="empty"><b>Pas d’actualité pour le moment</b>Suivez le club sur Facebook pour ne rien manquer.</div>`}
+  ${actus.length?`<div class="news">${actus.map(a=>`<article class="post">${a.photo?`<div class="ph"><img src="${esc(imgSrc(a.photo))}" alt="" loading="lazy"></div>`:""}<time datetime="${esc(a.date)}">${esc(fmtDate(a.date))}</time><h3>${esc(a.titre)}</h3><p>${esc(a.texte)}</p></article>`).join("")}</div>`:`<div class="empty"><b>Pas d’actualité pour le moment</b>Suivez le club sur Facebook pour ne rien manquer.</div>`}
 </div></section>
 
-${D.coachs.length?`<section class="band" id="coachs"><div class="wrap">
+${(D.galerie||[]).length?`<section class="band" id="photos"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><p>Entraînements, galas et moments de vie du club.</p></div>
+  <div class="gallery">${D.galerie.map((g,i)=>`<figure><button data-zoom="${i}" aria-label="Agrandir la photo"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" loading="lazy"></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
+</div></section>`:""}
+${D.coachs.length?`<section class="band${(D.galerie||[]).length?" alt":""}" id="coachs"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">L’encadrement</div><h2>Coachs &amp; bureau</h2></div></div>
-  <div class="coachs">${D.coachs.map(k=>`<div class="coach-card"><div class="ini">${esc(initials(k.nom))}</div><h3>${esc(k.nom)}</h3><div class="role">${esc(k.role)}</div><p>${esc(k.bio)}</p></div>`).join("")}</div>
+  <div class="coachs">${D.coachs.map(k=>`<div class="coach-card">${k.photo?`<img class="avatar" src="${esc(imgSrc(k.photo))}" alt="${esc(k.nom)}">`:`<div class="ini">${esc(initials(k.nom))}</div>`}<h3>${esc(k.nom)}</h3><div class="role">${esc(k.role)}</div><p>${esc(k.bio)}</p></div>`).join("")}</div>
 </div></section>`:""}
 
 <section class="band${D.coachs.length?" alt":""}" id="tenue"><div class="wrap kit">
@@ -332,6 +432,7 @@ ${D.coachs.length?`<section class="band" id="coachs"><div class="wrap">
       <div><a class="btn" href="${mapHref(c)}" target="_blank" rel="noopener">Itinéraire</a></div>
     </div>
   </div>
+  ${formHTML(D)}
 </div></section>
 
 <footer><div class="wrap">
@@ -345,7 +446,7 @@ ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 }
 
 /* ---------- Admin ---------- */
-const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["coachs","Coachs & bureau"]];
+const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["galerie","Photos"],["coachs","Coachs & bureau"]];
 const field=(label,path,val,opts={})=>{
   const id="f-"+path.replace(/[^\w]/g,"-");
   const cls=opts.full?"f full":"f";
@@ -358,6 +459,12 @@ const delBtn=(list,i)=>confirmDel===list+":"+i
   ?`<span class="confirm">Supprimer ?<button class="btn sm" data-del="${list}:${i}">Oui</button><button class="btn ghost sm" data-cancel-del>Non</button></span>`
   :`<button class="btn danger sm" data-ask-del="${list}:${i}">Supprimer</button>`;
 
+const PREV={};
+const imgSrc=p=>PREV[p]||p;
+let uploading=0;
+const photoField=(label,path,val)=>`<div class="f full"><span>${label}</span><div class="photo-pick">${val?`<img src="${esc(imgSrc(val))}" alt="">`:'<span class="none">Aucune</span>'}
+  <span class="btn ghost sm file-btn">${val?"Changer":"Choisir une photo"}<input type="file" accept="image/*" data-photo="${path}" aria-label="${label}"></span>
+  ${val?`<button class="btn danger sm" data-photo-del="${path}">Retirer</button>`:""}</div></div>`;
 function adminTab(){
   const d=draft,c=d.club;
   if(tab==="connexion") return `<p class="help">Le site est stocké sur GitHub. Pour enregistrer vos modifications, le site a besoin d’un jeton d’accès GitHub. Il reste enregistré uniquement sur cet appareil.</p>
@@ -382,7 +489,7 @@ function adminTab(){
     ${field("Adresse","club.adresse",c.adresse)}${field("Code postal et ville","club.ville",c.ville)}
     ${field("Accès / stationnement","club.acces",c.acces,{full:1})}
     ${field("Téléphone","club.tel",c.tel)}${field("WhatsApp","club.whatsapp",c.whatsapp)}
-    ${field("E-mail","club.email",c.email,{type:"email"})}${field("Lien Facebook","club.facebook",c.facebook,{ph:"https://www.facebook.com/…"})}
+    ${field("E-mail","club.email",c.email,{type:"email"})}${field("E-mail qui reçoit les demandes du formulaire","club.formEmail",c.formEmail||c.email,{type:"email"})}${field("Lien Facebook","club.facebook",c.facebook,{ph:"https://www.facebook.com/…"})}
     ${field("Lien TikTok","club.tiktok",c.tiktok,{ph:"https://www.tiktok.com/@…"})}${field("Lien Instagram","club.instagram",c.instagram,{ph:"https://www.instagram.com/…"})}
   </div>`;
   if(tab==="planning") return `<p class="help">Un bloc par créneau. Cochez « à confirmer » tant que l’horaire n’est pas définitif : un bandeau d’avertissement s’affiche alors sur le site.</p>
@@ -404,16 +511,24 @@ function adminTab(){
     ${d.documents.map((x,i)=>`<div class="item" style="display:flex;gap:8px;align-items:center;padding:8px">${field("",`documents.${i}`,x,{full:1})}${delBtn("documents",i)}</div>`).join("")}
     <button class="btn ghost" data-add="documents">+ Ajouter un document</button>
     <div class="fgrid" style="margin-top:20px">${field("Cours d’essai",`essai`,d.essai,{type:"textarea",full:1})}</div>`;
+  if(tab==="galerie"){ if(!d.galerie) d.galerie=[];
+    return `<p class="help">Les photos sont réduites automatiquement avant l’envoi. Choisissez-en plusieurs d’un coup si besoin. Pensez à l’accord des parents pour les photos d’enfants.</p>
+    ${GH.token?`<span class="btn ghost file-btn" style="margin-bottom:14px">+ Ajouter des photos<input type="file" accept="image/*" multiple data-gal-add="1" aria-label="Ajouter des photos"></span>`:'<p class="notice">Connectez-vous d’abord dans l’onglet Connexion pour envoyer des photos.</p>'}
+    ${uploading?`<p class="help">Envoi en cours : ${uploading} photo(s)…</p>`:""}
+    ${d.galerie.map((g,i)=>`<div class="item gal-item"><img src="${esc(imgSrc(g.src))}" alt=""><div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+      ${field("Légende (facultatif)",`galerie.${i}.legende`,g.legende||"",{ph:"Entraînement enfants, gala…"})}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${i>0?`<button class="btn ghost sm" data-move="${i}:-1">↑ Monter</button>`:""}${i<d.galerie.length-1?`<button class="btn ghost sm" data-move="${i}:1">↓ Descendre</button>`:""}${delBtn("galerie",i)}</div>
+    </div></div>`).join("")}`;}
   if(tab==="actus") return `<p class="help">Les actualités s’affichent de la plus récente à la plus ancienne.</p>
     <button class="btn ghost" data-add="actus" style="margin-bottom:12px">+ Nouvelle actualité</button>
     ${d.actus.map((a,i)=>`<div class="item"><div class="item-head"><b>${esc(a.titre||"Nouvelle actualité")}</b>${delBtn("actus",i)}</div><div class="fgrid">
       ${field("Date",`actus.${i}.date`,a.date,{type:"date"})}${field("Titre",`actus.${i}.titre`,a.titre)}
-      ${field("Texte",`actus.${i}.texte`,a.texte,{type:"textarea",full:1})}
+      ${field("Texte",`actus.${i}.texte`,a.texte,{type:"textarea",full:1})}${GH.token?photoField("Photo (facultatif)",`actus.${i}.photo`,a.photo):""}
     </div></div>`).join("")}`;
   if(tab==="coachs") return `<p class="help">La section Coachs n’apparaît sur le site que si au moins une personne est renseignée.</p>
     ${d.coachs.map((k,i)=>`<div class="item"><div class="item-head"><b>${esc(k.nom||"Nouvelle personne")}</b>${delBtn("coachs",i)}</div><div class="fgrid">
       ${field("Nom",`coachs.${i}.nom`,k.nom)}${field("Rôle",`coachs.${i}.role`,k.role,{ph:"Coach principal, Président…"})}
-      ${field("Présentation",`coachs.${i}.bio`,k.bio,{type:"textarea",full:1})}
+      ${field("Présentation",`coachs.${i}.bio`,k.bio,{type:"textarea",full:1})}${GH.token?photoField("Photo (facultatif)",`coachs.${i}.photo`,k.photo):""}
     </div></div>`).join("")}
     <button class="btn ghost" data-add="coachs">+ Ajouter une personne</button>`;
 }
@@ -425,7 +540,7 @@ function renderAdmin(){
   root.innerHTML=`<div class="admin" role="dialog" aria-label="Gestion du site">
     <div class="admin-bar"><h2>Gestion du site</h2>${dirty?'<span class="dirty">Modifications non enregistrées</span>':""}
       <button class="btn ghost sm" id="close-admin">${dirty?"Annuler":"Fermer"}</button>
-      <button class="btn sm" id="save-admin" ${dirty&&!saving&&GH.token?"":"disabled"} title="${GH.token?"":"Connectez-vous d’abord (onglet Connexion)"}">${saving?"Enregistrement…":"Enregistrer et publier"}</button></div>
+      <button class="btn sm" id="save-admin" ${dirty&&!saving&&!uploading&&GH.token?"":"disabled"} title="${GH.token?"":"Connectez-vous d’abord (onglet Connexion)"}">${saving?"Enregistrement…":"Enregistrer et publier"}</button></div>
     <div class="admin-tabs" role="tablist">${TABS.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${k===tab}">${l}</button>`).join("")}</div>
     <div class="admin-body"><div class="wrap">${adminTab()}</div></div></div>`;
   root.querySelector(".admin-body").scrollTop=scroll;
@@ -469,13 +584,50 @@ async function save(){
   }
 }
 
+async function ghPutFile(path,content,message){
+  const url=`https://api.github.com/repos/${encodeURIComponent(GH.owner)}/${encodeURIComponent(GH.repo)}/contents/${path}`;
+  const r=await fetch(url,{method:"PUT",headers:{"Authorization":"Bearer "+GH.token,"Accept":"application/vnd.github+json"},body:JSON.stringify({message,content})});
+  if(!r.ok) throw r.status;
+}
+async function shrink(file){
+  let src;
+  try{src=await createImageBitmap(file,{imageOrientation:"from-image"})}catch(_){src=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=URL.createObjectURL(file)})}
+  const max=1600,w=src.width,h=src.height,k=Math.min(1,max/Math.max(w,h));
+  const c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);
+  c.getContext("2d").drawImage(src,0,0,c.width,c.height);
+  return c.toDataURL("image/jpeg",0.82);
+}
+async function uploadPhoto(file){
+  const dataUrl=await shrink(file);
+  const path=`photos/${new Date().toISOString().slice(0,10)}-${uid()}.jpg`;
+  await ghPutFile(path,dataUrl.split(",")[1],"Ajout d’une photo");
+  PREV[path]=dataUrl;
+  return path;
+}
+async function handleFiles(files,onDone){
+  if(!GH.token){toast("Connectez-vous d’abord dans l’onglet Connexion.");return}
+  for(const f of files){
+    uploading++;renderAdmin();
+    try{const p=await uploadPhoto(f);onDone(p);dirty=true}
+    catch(st){toast(st===401?"Jeton refusé : vérifiez l’onglet Connexion.":st===403||st===404?"Accès refusé au dépôt : vérifiez le jeton.":"Une photo n’a pas pu être envoyée. Réessayez.")}
+    uploading--;renderAdmin();
+  }
+  if(!uploading) toast("Photo(s) ajoutée(s). Enregistrez pour publier.");
+}
+
 const BLANK={planning:()=>({id:uid(),jour:0,debut:"18:00",fin:"19:00",cours:"",public:"Adultes",coach:"",exemple:false}),
   tarifs:()=>({id:uid(),formule:"",prix:"",detail:""}),documents:()=>"",
-  actus:()=>({id:uid(),date:new Date().toISOString().slice(0,10),titre:"",texte:""}),coachs:()=>({id:uid(),nom:"",role:"",bio:""})};
+  actus:()=>({id:uid(),date:new Date().toISOString().slice(0,10),titre:"",texte:""}),coachs:()=>({id:uid(),nom:"",role:"",bio:"",photo:""}),galerie:()=>({id:uid(),src:"",legende:""})};
 
 document.addEventListener("click",e=>{
+  const tl=e.target.closest("a[data-type]"); if(tl){e.preventDefault();goForm(tl.dataset.type);return}
   const el=e.target.closest("button,[data-filter]"); if(!el) return;
   if(el.dataset.filter){filter=el.dataset.filter;render();return}
+  if(el.dataset.try){const s=DATA.planning.find(x=>x.id===el.dataset.try);if(s&&s.public==="Enfants"){FORM.pour="Mon enfant"}goForm("essai",s?s.cours:"");return}
+  if(el.id==="form-new"){FORM.status="idle";FORM.message="";refreshForm();return}
+  if(el.dataset.zoom!==undefined){const g=DATA.galerie[+el.dataset.zoom];const lb=document.createElement("div");lb.className="lightbox";lb.setAttribute("role","dialog");lb.innerHTML=`<img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"")}">${g.legende?`<p>${esc(g.legende)}</p>`:""}`;lb.onclick=()=>lb.remove();document.body.appendChild(lb);return}
+  if(el.dataset.photoDel){setPath(draft,el.dataset.photoDel,"");dirty=true;renderAdmin();return}
+  if(el.dataset.move){const [i,dir]=el.dataset.move.split(":").map(Number);const g=draft.galerie;[g[i],g[i+dir]]=[g[i+dir],g[i]];dirty=true;renderAdmin();return}
   if(el.dataset.copy!==undefined){const v=el.dataset.copy;const done=()=>{el.textContent="Copié";setTimeout(()=>el.textContent="Copier",1500)};
     try{navigator.clipboard.writeText(v).then(done,()=>{selectNear(el)})}catch(_){selectNear(el)}return}
   if(el.id==="open-admin"){openAdmin();return}
@@ -490,12 +642,17 @@ document.addEventListener("click",e=>{
   if(el.dataset.del){const [l,i]=el.dataset.del.split(":");draft[l].splice(+i,1);confirmDel=null;dirty=true;renderAdmin();return}
 });
 function selectNear(el){const v=el.parentElement.querySelector(".val");if(!v)return;const r=document.createRange();r.selectNodeContents(v);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+document.addEventListener("submit",e=>{if(e.target.id==="ask-form"){e.preventDefault();sendForm()}});
 document.addEventListener("input",e=>{
-  const t=e.target; if(!draft||!t.dataset||!t.dataset.path) return;
+  const t=e.target;
+  if(t.dataset&&t.dataset.form){const k=t.dataset.form;FORM[k]=t.type==="checkbox"?t.checked:t.value;if(k==="type"||k==="pour")refreshForm();return} if(!draft||!t.dataset||!t.dataset.path) return;
   let v=t.dataset.bool?t.checked:t.value; if(t.dataset.num) v=+v;
   setPath(draft,t.dataset.path,v); markDirty();
 });
-document.addEventListener("change",e=>{const t=e.target;if(draft&&t.dataset&&t.dataset.path&&(t.tagName==="SELECT"||t.dataset.bool))renderAdmin()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelector(".lightbox")?.remove()});
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset&&t.dataset.galAdd&&draft){const fs=[...t.files];t.value="";handleFiles(fs,p=>draft.galerie.push({id:uid(),src:p,legende:""}));return}
+  if(t.dataset&&t.dataset.photo&&draft){const fs=[...t.files].slice(0,1);const path=t.dataset.photo;t.value="";handleFiles(fs,p=>setPath(draft,path,p));return}if(draft&&t.dataset&&t.dataset.path&&(t.tagName==="SELECT"||t.dataset.bool))renderAdmin()});
 
 function openAdmin(){draft=JSON.parse(JSON.stringify(DATA));dirty=false;confirmDel=null;tab=GH.token?"infos":"connexion";renderAdmin()}
 function checkHash(){if(location.hash==="#bureau"){canWrite=true;render();if(!draft)openAdmin()}}
