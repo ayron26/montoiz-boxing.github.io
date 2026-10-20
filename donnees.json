@@ -1,0 +1,89 @@
+{
+  "saison": "2026-2027",
+  "maj": "2026-10-20",
+  "club": {
+    "nom": "Montoiz’ Thaï Khmer Boxing",
+    "accroche": "Boxe thaï, boxe khmère et boxes d’Asie du Sud-Est à Montoison, pour les enfants comme pour les adultes.",
+    "presentation": "Montoiz’ Thaï Khmer Boxing est une jeune association sportive de la Drôme, anciennement Allex Thaï Khmer Boxing. Le club a pris son nouveau nom en septembre 2026, après une assemblée générale extraordinaire.\n\nGrâce à la mairie de Montoison, qui met gracieusement une salle dédiée à notre disposition, nous transmettons notre passion de la boxe thaïlandaise, de la boxe khmère et des sports de combat d’Asie du Sud-Est dans de bonnes conditions.\n\nNotre ambition : construire, avec les habitants, les associations et les acteurs de la commune, un club convivial, familial et ambitieux.",
+    "adresse": "2 Place de l’Église (ou Grande Rue)",
+    "ville": "26800 Montoison",
+    "acces": "Salle mise à disposition par la commune de Montoison, au centre du village.",
+    "tel": "06 58 40 32 45",
+    "whatsapp": "+33 6 58 40 32 45",
+    "email": "allexthaikhmerboxing@gmail.com",
+    "facebook": "",
+    "tiktok": "",
+    "instagram": ""
+  },
+  "planning": [
+    {
+      "id": "p1",
+      "jour": 2,
+      "debut": "18:00",
+      "fin": "19:30",
+      "cours": "Boxe thaï & khmère enfants",
+      "public": "Enfants",
+      "coach": "",
+      "exemple": true
+    },
+    {
+      "id": "p4",
+      "jour": 4,
+      "debut": "19:00",
+      "fin": "21:00",
+      "cours": "Adultes tous niveaux",
+      "public": "Adultes",
+      "coach": "",
+      "exemple": true
+    },
+    {
+      "id": "kao17h3",
+      "jour": 2,
+      "debut": "19:30",
+      "fin": "21:00",
+      "cours": "",
+      "public": "Adultes",
+      "coach": "",
+      "exemple": false
+    },
+    {
+      "id": "ftb0ggi",
+      "jour": 4,
+      "debut": "18:00",
+      "fin": "19:30",
+      "cours": "",
+      "public": "Enfants",
+      "coach": "",
+      "exemple": false
+    }
+  ],
+  "tarifs": [],
+  "documents": [
+    "Fiche d’inscription remplie et signée",
+    "Certificat médical ou questionnaire de santé",
+    "Autorisation parentale pour les mineurs",
+    "Règlement de la cotisation"
+  ],
+  "essai": "Envie d’essayer ? Contactez le club par téléphone, WhatsApp ou e-mail pour convenir d’un cours d’essai.",
+  "actus": [
+    {
+      "id": "a3",
+      "date": "2026-10-20",
+      "titre": "La tenue officielle du club est arrivée",
+      "texte": "Tee-shirts, débardeurs, shorts de boxe, survêtements et casquettes aux couleurs du club. Une gamme fabriquée par Atelier Mirabel, entreprise drômoise basée à Valence. Une même tenue, des valeurs communes et une seule famille : celle du club."
+    },
+    {
+      "id": "a2",
+      "date": "2026-10-01",
+      "titre": "Lady Boxing – Octobre Rose",
+      "texte": "Une séance de boxe pour les femmes dans le cadre d’Octobre Rose. L’intégralité des participations est reversée à la Ligue contre le cancer (3 avenue de Romans, Valence). Accueil et échauffement dès 18h00."
+    },
+    {
+      "id": "a1",
+      "date": "2026-09-30",
+      "titre": "Allex Thaï Khmer Boxing devient Montoiz’ Thaï Khmer Boxing",
+      "texte": "Décision prise à l’unanimité du bureau lors d’une assemblée générale extraordinaire. Un immense merci à la mairie de Montoison, qui met gracieusement à notre disposition un lieu dédié à notre sport. Une nouvelle identité, un nouveau lieu, une nouvelle aventure."
+    }
+  ],
+  "coachs": []
+}

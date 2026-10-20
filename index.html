@@ -337,7 +337,7 @@ ${D.coachs.length?`<section class="band" id="coachs"><div class="wrap">
 <footer><div class="wrap">
   <span>© ${new Date().getFullYear()} ${esc(c.nom)} · Association sportive · ${esc(c.ville)}</span>
   <span class="flags">France · Thaïlande · Cambodge</span>
-  <span>Mis à jour le ${esc(fmtDate(D.maj))}</span>
+  <span>Mis à jour le ${esc(fmtDate(D.maj))} · <a href="#bureau">Espace bureau</a></span>
 </div></footer>
 ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 <div id="admin-root"></div>`;
@@ -345,7 +345,7 @@ ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 }
 
 /* ---------- Admin ---------- */
-const TABS=[["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["coachs","Coachs & bureau"]];
+const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["coachs","Coachs & bureau"]];
 const field=(label,path,val,opts={})=>{
   const id="f-"+path.replace(/[^\w]/g,"-");
   const cls=opts.full?"f full":"f";
@@ -360,6 +360,21 @@ const delBtn=(list,i)=>confirmDel===list+":"+i
 
 function adminTab(){
   const d=draft,c=d.club;
+  if(tab==="connexion") return `<p class="help">Le site est stocké sur GitHub. Pour enregistrer vos modifications, le site a besoin d’un jeton d’accès GitHub. Il reste enregistré uniquement sur cet appareil.</p>
+    <div class="fgrid">
+      <label class="f" for="gh-owner">Compte GitHub<input id="gh-owner" value="${esc(GH.owner)}" placeholder="montoiz-boxing" autocomplete="username"></label>
+      <label class="f" for="gh-repo">Dépôt<input id="gh-repo" value="${esc(GH.repo)}" placeholder="montoiz-boxing.github.io"></label>
+      <label class="f full" for="gh-token">Jeton d’accès<input id="gh-token" type="password" value="${esc(GH.token)}" placeholder="github_pat_…" autocomplete="off"></label>
+    </div>
+    <div class="cta" style="margin:14px 0 24px"><button class="btn sm" id="gh-save">${GH.token?"Mettre à jour la connexion":"Se connecter"}</button>${GH.token?'<button class="btn danger sm" id="gh-logout">Oublier le jeton sur cet appareil</button>':""}</div>
+    <div class="item"><div class="item-head"><b>Créer un jeton (une seule fois)</b></div>
+      <ol class="help" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        <li>Sur github.com : photo de profil → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+        <li>Nom : « Site club ». Expiration : 1 an.</li>
+        <li><b>Repository access</b> : <i>Only select repositories</i> → choisissez le dépôt du site.</li>
+        <li><b>Permissions</b> → <b>Contents</b> : <i>Read and write</i>.</li>
+        <li>Générez, copiez le jeton et collez-le ci-dessus. Ne le partagez jamais.</li>
+      </ol></div>`;
   if(tab==="infos") return `<p class="help">Ces informations apparaissent en haut de page et dans la section Contact.</p><div class="fgrid">
     ${field("Nom du club","club.nom",c.nom)}${field("Saison","saison",d.saison,{ph:"2026-2027"})}
     ${field("Phrase d’accroche","club.accroche",c.accroche,{full:1})}
@@ -410,7 +425,7 @@ function renderAdmin(){
   root.innerHTML=`<div class="admin" role="dialog" aria-label="Gestion du site">
     <div class="admin-bar"><h2>Gestion du site</h2>${dirty?'<span class="dirty">Modifications non enregistrées</span>':""}
       <button class="btn ghost sm" id="close-admin">${dirty?"Annuler":"Fermer"}</button>
-      <button class="btn sm" id="save-admin" ${dirty&&!saving?"":"disabled"}>${saving?"Enregistrement…":"Enregistrer et publier"}</button></div>
+      <button class="btn sm" id="save-admin" ${dirty&&!saving&&GH.token?"":"disabled"} title="${GH.token?"":"Connectez-vous d’abord (onglet Connexion)"}">${saving?"Enregistrement…":"Enregistrer et publier"}</button></div>
     <div class="admin-tabs" role="tablist">${TABS.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${k===tab}">${l}</button>`).join("")}</div>
     <div class="admin-body"><div class="wrap">${adminTab()}</div></div></div>`;
   root.querySelector(".admin-body").scrollTop=scroll;
@@ -420,30 +435,37 @@ function markDirty(){if(!dirty){dirty=true;const b=document.querySelector(".admi
 
 function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;t.setAttribute("role","status");document.body.appendChild(t);setTimeout(()=>t.remove(),3500)}
 
-function buildDoc(data){
-  const json=JSON.stringify(data).replace(/</g,"\\u003c");
-  const styles=[...document.querySelectorAll("style")].map(s=>s.textContent).filter(t=>t.includes("--f-display"))[0]||"";
-  const font=document.querySelector('link[href*="fonts.googleapis.com/css2"]').getAttribute("href");
-  const script=document.getElementById("app-script").textContent;
-  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'
-   +'<title>Montoiz Thaï Khmer Boxing</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="stylesheet" href="'+font.replace(/&/g,"&amp;")+'">\n<style>'+styles+'</style>\n\n<div id="app"></div>\n\n<script type="application/json" id="club-data">'+json+'<\/script>\n<script id="app-script">'+script+'<\/script></body></html>';
+const GH=(()=>{let s={};try{s=JSON.parse(localStorage.getItem("mtkb-gh")||"{}")}catch(_){}
+  const host=location.hostname, seg=location.pathname.split("/").filter(Boolean)[0]||"";
+  const owner=host.endsWith(".github.io")?host.split(".")[0]:"";
+  const repo=host.endsWith(".github.io")?(seg&&!seg.includes(".")?seg:host):"";
+  return {owner:s.owner||owner,repo:s.repo||repo,token:s.token||""}})();
+function storeGH(){try{localStorage.setItem("mtkb-gh",JSON.stringify(GH))}catch(_){}}
+const b64=s=>{const b=new TextEncoder().encode(s);let x="";for(let i=0;i<b.length;i+=0x8000)x+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(x)};
+async function ghPut(content,retry){
+  const url=`https://api.github.com/repos/${encodeURIComponent(GH.owner)}/${encodeURIComponent(GH.repo)}/contents/donnees.json`;
+  const hd={"Authorization":"Bearer "+GH.token,"Accept":"application/vnd.github+json"};
+  let sha;const g=await fetch(url+"?t="+Date.now(),{headers:hd,cache:"no-store"});
+  if(g.ok){sha=(await g.json()).sha}else if(g.status!==404){throw g.status}
+  const r=await fetch(url,{method:"PUT",headers:hd,body:JSON.stringify({message:"Mise à jour du site ("+new Date().toLocaleDateString("fr-FR")+")",content:b64(content),...(sha?{sha}:{})})});
+  if(r.status===409&&!retry) return ghPut(content,true);
+  if(!r.ok) throw r.status;
 }
-
 async function save(){
-  if(!artifactNS||saving) return;
+  if(saving||!GH.token) return;
   saving=true;renderAdmin();
   const next=JSON.parse(JSON.stringify(draft));
   next.maj=new Date().toISOString().slice(0,10);
   try{
-    await artifactNS.publish(buildDoc(next));
-    DATA=next;dirty=false;draft=null;saving=false;render();toast("Enregistré. Le site est à jour pour tout le monde.");
-  }catch(e){
-    saving=false;
-    const code=e&&e.code;
-    if(code==="conflict"){toast("Quelqu’un a enregistré en même temps. La page se recharge avec sa version.");return}
-    if(code==="not_writer"||code==="not_granted"){canWrite=false;draft=null;render();toast("Ce compte peut voir le site mais pas le modifier.");return}
-    if(code==="rate_limited"){renderAdmin();toast("Trop d’enregistrements rapprochés. Réessayez dans une minute.");return}
-    renderAdmin();toast("L’enregistrement n’a pas abouti. Vérifiez la connexion et réessayez.");
+    await ghPut(JSON.stringify(next,null,2));
+    DATA=next;dirty=false;draft=null;saving=false;render();
+    toast("Enregistré. Le site public se met à jour d’ici 1 à 2 minutes.");
+  }catch(st){
+    saving=false;renderAdmin();
+    if(st===401) toast("Jeton refusé : il est expiré ou mal copié. Vérifiez l’onglet Connexion.");
+    else if(st===403||st===404) toast("Accès refusé : vérifiez le compte, le dépôt et la permission Contents du jeton.");
+    else if(st===409) toast("Le fichier a changé entre-temps. Rechargez la page puis recommencez.");
+    else toast("L’enregistrement n’a pas abouti. Vérifiez la connexion internet et réessayez.");
   }
 }
 
@@ -456,8 +478,10 @@ document.addEventListener("click",e=>{
   if(el.dataset.filter){filter=el.dataset.filter;render();return}
   if(el.dataset.copy!==undefined){const v=el.dataset.copy;const done=()=>{el.textContent="Copié";setTimeout(()=>el.textContent="Copier",1500)};
     try{navigator.clipboard.writeText(v).then(done,()=>{selectNear(el)})}catch(_){selectNear(el)}return}
-  if(el.id==="open-admin"){draft=JSON.parse(JSON.stringify(DATA));dirty=false;tab="infos";renderAdmin();return}
-  if(el.id==="close-admin"){draft=null;dirty=false;confirmDel=null;renderAdmin();return}
+  if(el.id==="open-admin"){openAdmin();return}
+  if(el.id==="gh-save"){GH.owner=document.getElementById("gh-owner").value.trim();GH.repo=document.getElementById("gh-repo").value.trim();GH.token=document.getElementById("gh-token").value.trim();storeGH();tab=GH.token?"infos":"connexion";renderAdmin();toast(GH.token?"Connexion enregistrée sur cet appareil.":"Collez un jeton pour vous connecter.");return}
+  if(el.id==="gh-logout"){GH.token="";storeGH();renderAdmin();toast("Jeton supprimé de cet appareil.");return}
+  if(el.id==="close-admin"){draft=null;dirty=false;confirmDel=null;if(location.hash==="#bureau")history.replaceState(null,"",location.pathname+location.search);renderAdmin();return}
   if(el.id==="save-admin"){save();return}
   if(el.dataset.tab){tab=el.dataset.tab;confirmDel=null;renderAdmin();return}
   if(el.dataset.add){const l=el.dataset.add;const it=BLANK[l]();l==="actus"?draft[l].unshift(it):draft[l].push(it);dirty=true;renderAdmin();return}
@@ -473,15 +497,11 @@ document.addEventListener("input",e=>{
 });
 document.addEventListener("change",e=>{const t=e.target;if(draft&&t.dataset&&t.dataset.path&&(t.tagName==="SELECT"||t.dataset.bool))renderAdmin()});
 
+function openAdmin(){draft=JSON.parse(JSON.stringify(DATA));dirty=false;confirmDel=null;tab=GH.token?"infos":"connexion";renderAdmin()}
+function checkHash(){if(location.hash==="#bureau"){canWrite=true;render();if(!draft)openAdmin()}}
+canWrite=!!GH.token;
 render();
-(async()=>{
-  try{
-    if(!window.claude||!claude.use) return;
-    const [a,u]=await Promise.all([claude.use("artifact"),claude.use("user")]);
-    if(!a) return;
-    const ok=u?await u.canEdit():false;
-    if(ok){artifactNS=a;canWrite=true;render()}
-  }catch(_){}
-})();
+fetch("donnees.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j){DATA=j;if(!draft)render()}}).catch(()=>{}).finally(checkHash);
+addEventListener("hashchange",checkHash);
 </script></body>
 </html>
