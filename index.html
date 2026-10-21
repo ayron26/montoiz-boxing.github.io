@@ -265,6 +265,30 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .legal dt{color:var(--muted)}.legal dd{margin:0;font-weight:600;overflow-wrap:anywhere}
 @media (max-width:560px){.legal dl{grid-template-columns:1fr}.legal dd{margin-bottom:8px}}
 footer a{color:var(--muted)}
+/* Pages */
+.page{animation:pagein .35s ease-out both}
+@keyframes pagein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page > section.band:first-child > .wrap{padding-top:48px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);text-decoration:none;color:var(--fg);transition:border-color .2s,transform .2s;min-width:0}
+.tile:hover{border-color:var(--gold);transform:translateY(-2px)}
+.tile b{font-family:var(--f-display);font-weight:800;font-size:28px;text-transform:uppercase;line-height:1;overflow-wrap:anywhere}
+.tile > span:not(.eyebrow){color:var(--muted);font-size:15px}
+.tile i{font-style:normal;margin-top:auto;padding-top:8px;font-family:var(--f-label);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--gold-2)}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.tiles{grid-template-columns:1fr}}
+.cta-band .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+.cta-band h2{font-size:clamp(34px,5vw,54px);font-weight:800;margin:8px 0 10px}
+.cta-band p{color:var(--muted);margin:0;max-width:52ch}
+.cta-band{background:radial-gradient(ellipse 50% 90% at 85% 50%,color-mix(in srgb,var(--gold) 16%,transparent),transparent 70%),var(--bg)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:22px}
+.thumbs button{all:unset;cursor:zoom-in;border-radius:8px;overflow:hidden;border:1px solid var(--line);display:block}
+.thumbs button:focus-visible{outline:2px solid var(--gold-2);outline-offset:2px}
+.thumbs img{display:block;width:100%;aspect-ratio:1;object-fit:cover;transition:transform .3s}
+.thumbs button:hover img{transform:scale(1.06)}
+nav.links a[aria-current="page"]{color:var(--fg)}
+nav.links a[aria-current="page"]::after{transform:scaleX(1)}
+.menu-panel nav a[aria-current="page"] span{color:var(--gold)}
 /* Demande */
 .ask{margin-top:28px;display:grid;grid-template-columns:1fr 1.6fr;gap:28px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:24px;scroll-margin-top:80px}
 .ask h3{font-size:clamp(30px,4vw,42px);font-weight:800;margin:8px 0 12px}
@@ -403,7 +427,7 @@ async function sendForm(){
   refreshForm();
 }
 function refreshForm(){const el=document.getElementById("demande");if(!el)return;const tmp=document.createElement("div");tmp.innerHTML=formHTML(DATA);el.replaceWith(tmp.firstElementChild)}
-function goForm(type,cours){FORM.type=type;if(cours!==undefined)FORM.cours=cours;if(FORM.status==="sent")FORM.status="idle";refreshForm();document.getElementById("demande")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});setTimeout(()=>document.getElementById("fm-nom")?.focus({preventScroll:true}),400)}
+function goForm(type,cours){FORM.type=type;if(cours!==undefined)FORM.cours=cours;if(FORM.status==="sent")FORM.status="idle";if(page!=="contact"){go("contact",{keepScroll:true})}refreshForm();document.getElementById("demande")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});setTimeout(()=>document.getElementById("fm-nom")?.focus({preventScroll:true}),400)}
 
 const daysTo=d=>{const t=new Date();t.setHours(0,0,0,0);return Math.round((new Date(d+"T00:00:00")-t)/864e5)};
 const hashStr=s=>{let x=0;for(const ch of String(s))x=(x*31+ch.charCodeAt(0))|0;return x};
@@ -434,9 +458,29 @@ function legalHTML(){
   </div></div>`;
 }
 function showLegal(){if(document.querySelector(".legal"))return;const t=document.createElement("div");t.innerHTML=legalHTML();document.body.appendChild(t.firstElementChild);document.body.style.overflow="hidden";document.getElementById("legal-x").focus()}
-function hideLegal(){document.querySelector(".legal")?.remove();if(!draft)document.body.style.overflow="";if(location.hash==="#mentions")history.replaceState(null,"",location.pathname+location.search)}
+function hideLegal(){document.querySelector(".legal")?.remove();if(!draft)document.body.style.overflow="";if(location.hash==="#mentions")history.replaceState(null,"",page==="accueil"?location.pathname+location.search:"#"+page)}
 
 let menuOpen=false;
+const PAGES=["accueil","club","planning","tarifs","agenda","actus","photos","contact"];
+const pageFromHash=()=>{const x=location.hash.slice(1);return PAGES.includes(x)?x:(x==="demande"?"contact":null)};
+let page=pageFromHash()||"accueil";
+function nextSession(list){
+  if(!list||!list.length) return null;
+  const now=new Date(),dow=(now.getDay()+6)%7,hm=now.toTimeString().slice(0,5);
+  let best=null;
+  for(const s of list){let d=(s.jour-dow+7)%7;if(d===0&&s.debut<=hm)d=7;if(!best||d<best.d||(d===best.d&&s.debut<best.s.debut))best={s,d}}
+  return best;
+}
+function go(p,opts={}){
+  if(!PAGES.includes(p)) p="accueil";
+  if(menuOpen) setMenu(false);
+  const changed=p!==page;page=p;
+  const hash=p==="accueil"?"":"#"+p;
+  if(location.hash!==hash&&!(p==="accueil"&&!location.hash)){try{history.pushState(null,"",hash||location.pathname+location.search)}catch(_){}}
+  if(changed||opts.force){SL.i=0;render()}
+  if(!opts.keepScroll) window.scrollTo({top:0,behavior:"auto"});
+  if(changed) document.querySelector("#main h1, #main h2")?.setAttribute("tabindex","-1"),document.querySelector("#main h1, #main h2")?.focus({preventScroll:true});
+}
 const RM=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
 function setMenu(open){
   menuOpen=open;
@@ -449,6 +493,8 @@ function setMenu(open){
 }
 let spyObs=null;
 function initSpy(){
+  document.querySelectorAll("[data-nav]").forEach(a=>{const on=a.dataset.nav===page;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  return;
   if(spyObs) spyObs.disconnect();
   if(!("IntersectionObserver" in window)) return;
   spyObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;document.querySelectorAll("[data-nav]").forEach(a=>a.classList.toggle("on",a.dataset.nav===id))}})},{rootMargin:"-40% 0px -55% 0px"});
@@ -526,35 +572,53 @@ function render(){
   const navLinks=[["club","Le club","Disciplines et valeurs"],["planning","Planning","Horaires de la semaine"],["tarifs","Inscription","Tarifs et documents"],
     ...(evts.length?[["agenda","Agenda","Prochains événements"]]:[]),["actus","Actus","Nouvelles du club"],
     ...((D.galerie||[]).length?[["photos","Photos","En images"]]:[]),["contact","Contact","Adresse et formulaire"]];
-  document.getElementById("app").innerHTML=`
-${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><div class="wrap"><span>${esc(an.texte)}</span><button id="annonce-x" aria-label="Masquer l’annonce">×</button></div></div>`:""}
-<header class="top${menuOpen?" open":""}"><div class="wrap">
-  <a class="brand" href="#accueil" data-nav="accueil"><img src="${IMG.logo}" alt=""><span>Montoiz’<small>Thaï Khmer Boxing</small></span></a>
-  <nav class="links" aria-label="Menu principal">${navLinks.map(([id,l])=>`<a href="#${id}" data-nav="${id}">${l}</a>`).join("")}</nav>
-  <a class="btn sm nav-cta" href="#demande" data-type="essai">Cours d’essai</a>
-  <button class="burger" id="burger" aria-expanded="${menuOpen}" aria-controls="menu-panel" aria-label="${menuOpen?"Fermer le menu":"Ouvrir le menu"}"><span></span><span></span><span></span></button>
-</div></header>
-<div class="menu-panel" id="menu-panel"${menuOpen?"":" hidden"}><div class="wrap">
-  <nav aria-label="Menu">${navLinks.map(([id,l,s])=>`<a href="#${id}" data-nav="${id}"><span>${l}</span><small>${s}</small></a>`).join("")}</nav>
-  <div class="menu-contact">
-    <a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a>
-    <p><b>${esc(c.tel)}</b><br>${esc(c.adresse)}, ${esc(c.ville)}</p>
-  </div>
-</div></div>
-<div class="mongkol" aria-hidden="true"></div>
-
-<section class="hero" id="accueil"><div class="wrap">
+  const G=D.galerie||[];
+  const nx=nextSession(D.planning);
+  const postHTML=a=>`<article class="post">${a.photo?`<div class="ph"><img src="${esc(imgSrc(a.photo))}" alt="" loading="lazy"></div>`:""}<time datetime="${esc(a.date)}">${esc(fmtDate(a.date))}</time><h3>${esc(a.titre)}</h3><p>${esc(a.texte)}</p></article>`;
+  const P={
+    accueil:()=>`<section class="hero" id="accueil"><div class="wrap">
   <div>
     <div class="eyebrow">Association sportive · ${esc(c.ville)}</div>
     <h1>Montoiz’<br><em>Thaï Khmer</em><br>Boxing</h1>
     <p class="lead">${esc(c.accroche)}</p>
-    <div class="cta"><a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a><a class="btn ghost" href="#planning">Voir les horaires</a></div>
+    <div class="cta"><a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a><a class="btn ghost" href="#planning" data-nav="planning">Voir les horaires</a></div>
     <div class="tags"><span class="tag">Muay Thaï</span><span class="tag">Kun Khmer</span><span class="tag">Boxe d’Asie du Sud-Est</span><span class="tag">Enfants &amp; adultes</span></div>
   </div>
   <img class="logo-big" src="${IMG.logo}" alt="Logo Montoiz’ Thaï Khmer Boxing : tigre coiffé des tours d’Angkor, 26800">
 </div></section>
 
-<section class="band" id="club"><div class="wrap">
+<section class="band alt"><div class="wrap">
+  <div class="tiles">
+    <a class="tile" href="#planning" data-nav="planning"><span class="eyebrow">Prochain entraînement</span>${nx?`<b>${JOURS[nx.s.jour]} ${esc(nx.s.debut.replace(":","h"))}</b><span>${esc(nx.s.cours||nx.s.public)}${nx.d===0?" · aujourd’hui":nx.d===1?" · demain":""}</span>`:`<b>Planning</b><span>Les horaires arrivent bientôt</span>`}<i>Voir le planning →</i></a>
+    ${evts.length?`<a class="tile" href="#agenda" data-nav="agenda"><span class="eyebrow">Prochain événement</span><b>${esc(evts[0].titre)}</b><span>${esc(fmtDate(evts[0].date))}</span><i>Voir l’agenda →</i></a>`:`<a class="tile" href="#club" data-nav="club"><span class="eyebrow">Le club</span><b>Notre histoire</b><span>Disciplines, valeurs, encadrement</span><i>Découvrir →</i></a>`}
+    <a class="tile" href="#tarifs" data-nav="tarifs"><span class="eyebrow">Rejoindre le club</span><b>Inscription</b><span>Tarifs, documents, cours d’essai</span><i>Tout savoir →</i></a>
+    <a class="tile" href="#contact" data-nav="contact"><span class="eyebrow">Venir au club</span><b>${esc(c.ville.replace(/^\d+\s*/,""))}</b><span>${esc(c.adresse)}</span><i>Itinéraire et contact →</i></a>
+  </div>
+</div></section>
+
+${actus.length?`<section class="band"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">La vie du club</div><h2>Dernières actus</h2></div><a class="btn ghost sm" href="#actus" data-nav="actus">Toutes les actus →</a></div>
+  <div class="news">${actus.slice(0,3).map(postHTML).join("")}</div>
+</div></section>`:""}
+
+${G.length?`<section class="band alt"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><a class="btn ghost sm" href="#photos" data-nav="photos">Toutes les photos →</a></div>
+  <div class="slider" id="slider" role="region" aria-roledescription="carrousel" aria-label="Photos du club">
+    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="Agrandir la photo${g.legende?" : "+esc(g.legende):""}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" ${i>1?'loading="lazy"':""}></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
+    ${D.galerie.length>1?`<button class="sl-btn sl-prev" data-sl="-1" aria-label="Photo précédente">‹</button><button class="sl-btn sl-next" data-sl="1" aria-label="Photo suivante">›</button><div class="sl-progress" id="sl-progress"></div>`:""}
+  </div>
+  ${D.galerie.length>1?`<div class="sl-bar">
+    ${D.galerie.length<=15?`<div class="dots" role="group" aria-label="Choisir une photo">${D.galerie.map((_,i)=>`<button data-dot="${i}" aria-label="Photo ${i+1}"${i===0?' aria-current="true"':""}></button>`).join("")}</div>`:""}
+    <button class="btn ghost sm" id="sl-play" aria-pressed="false">Pause</button>
+    <span class="sl-count" id="sl-count">1 / ${D.galerie.length}</span>
+  </div>`:""}
+</div></section>`:""}
+
+<section class="band cta-band"><div class="wrap">
+  <div><div class="eyebrow">Premier cours</div><h2>Prêt à monter sur le ring ?</h2><p>Débutant, enfant ou confirmé : venez essayer un entraînement. Une tenue de sport et une bouteille d’eau suffisent.</p></div>
+  <div class="cta"><a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a><a class="btn ghost" href="#contact" data-nav="contact">Nous contacter</a></div>
+</div></section>`,
+    club:()=>`<section class="band" id="club"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Le club</div><h2>Un club, une identité,<br>un même esprit</h2></div></div>
   <div class="club-grid">
     <div class="text">
@@ -568,58 +632,11 @@ ${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><
     </div>
   </div>
 </div></section>
-
-<section class="band alt" id="planning"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Saison ${esc(D.saison)}</div><h2>Planning des entraînements</h2></div><p>Le jour en surbrillance, c’est aujourd’hui. Filtrez par public pour trouver votre cours.</p></div>
-  ${D.planning.length?`<div class="filters" role="group" aria-label="Filtrer par public">${pubs.map(p=>`<button class="chip" data-filter="${esc(p)}" aria-pressed="${p===filter}">${esc(p)}</button>`).join("")}</div>`:""}
-  ${hasEx?`<div class="notice"><span>⚠</span><span><b>Horaires indicatifs.</b> Les créneaux marqués « à confirmer » ne sont pas encore définitifs. Appelez le club avant votre premier cours.</span></div>`:""}
-  ${days.length?`<div class="week">${days.map(d=>`<div class="day${d===t?" today":""}"><h3>${JOURS[d]}${d===t?"<small>Aujourd’hui</small>":""}</h3>${shown.filter(s=>s.jour===d).map(s=>`
-    <div class="sess"><div class="t">${esc(s.debut)} – ${esc(s.fin)}</div><div class="c">${esc(s.cours)}</div>
-    <div class="m"><span class="pub" data-p="${esc(s.public)}">${esc(s.public)}</span>${s.exemple?'<span class="ex">à confirmer</span>':""}<button class="try" data-try="${esc(s.id)}">Essayer</button></div>
-    ${s.coach?`<div class="coach">Avec ${esc(s.coach)}</div>`:""}</div>`).join("")}</div>`).join("")}</div>`
-  :`<div class="empty"><b>Planning en préparation</b>Les horaires de la saison arrivent. En attendant, contactez le club au ${esc(c.tel)}.</div>`}
-</div></section>
-
-<section class="band" id="tarifs"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Rejoindre le club</div><h2>Tarifs &amp; inscription</h2></div></div>
-  <div class="tarif-grid">
-    <div class="prices">${D.tarifs.length?D.tarifs.map(p=>`<div class="price"><h3>${esc(p.formule)}</h3><div class="amt">${esc(p.prix)}</div><p>${esc(p.detail)}</p></div>`).join("")
-      :`<div class="empty"><b>Cotisations sur demande</b>Le montant des cotisations de la saison vous est communiqué par le bureau. Écrivez-nous ou appelez le ${esc(c.tel)}.</div>`}</div>
-    <aside class="docs"><h3>Documents à fournir</h3><ul>${D.documents.map(d=>`<li>${esc(d)}</li>`).join("")}</ul>
-      <div class="essai">${esc(D.essai)}</div></aside>
-  </div>
-</div></section>
-
-${evts.length?`<section class="band" id="agenda"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">À venir</div><h2>Agenda du club</h2></div><p>Galas, compétitions, stages et événements ouverts à tous.</p></div>
-  <div class="agenda">${evts.map(e=>{const n=daysTo(e.date);const dt=new Date(e.date+"T12:00:00");return `<article class="event">
-    <div class="cal"><b>${dt.getDate()}</b><span>${dt.toLocaleDateString("fr-FR",{month:"short"}).replace(".","")}</span></div>
-    <div style="min-width:0"><h3>${esc(e.titre)}</h3><div class="meta">${esc(dt.toLocaleDateString("fr-FR",{weekday:"long"}))}${e.heure?" · "+esc(e.heure.replace(":","h")):""}${e.lieu?" · "+esc(e.lieu):""}</div>${e.description?`<p>${esc(e.description)}</p>`:""}</div>
-    <div class="jx${n<=7?" soon":""}">${n===0?"Aujourd’hui":n===1?"Demain":"J-"+n}</div></article>`}).join("")}</div>
-</div></section>`:""}
-<section class="band alt" id="actus"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">La vie du club</div><h2>Actualités</h2></div><p>Galas, stages, événements et nouvelles de l’association.</p></div>
-  ${actus.length?`<div class="news">${actus.map(a=>`<article class="post">${a.photo?`<div class="ph"><img src="${esc(imgSrc(a.photo))}" alt="" loading="lazy"></div>`:""}<time datetime="${esc(a.date)}">${esc(fmtDate(a.date))}</time><h3>${esc(a.titre)}</h3><p>${esc(a.texte)}</p></article>`).join("")}</div>`:`<div class="empty"><b>Pas d’actualité pour le moment</b>Suivez le club sur Facebook pour ne rien manquer.</div>`}
-</div></section>
-
-${(D.galerie||[]).length?`<section class="band" id="photos"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><p>Entraînements, galas et moments de vie du club.</p></div>
-  <div class="slider" id="slider" role="region" aria-roledescription="carrousel" aria-label="Photos du club">
-    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="Agrandir la photo${g.legende?" : "+esc(g.legende):""}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" ${i>1?'loading="lazy"':""}></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
-    ${D.galerie.length>1?`<button class="sl-btn sl-prev" data-sl="-1" aria-label="Photo précédente">‹</button><button class="sl-btn sl-next" data-sl="1" aria-label="Photo suivante">›</button><div class="sl-progress" id="sl-progress"></div>`:""}
-  </div>
-  ${D.galerie.length>1?`<div class="sl-bar">
-    ${D.galerie.length<=15?`<div class="dots" role="group" aria-label="Choisir une photo">${D.galerie.map((_,i)=>`<button data-dot="${i}" aria-label="Photo ${i+1}"${i===0?' aria-current="true"':""}></button>`).join("")}</div>`:""}
-    <button class="btn ghost sm" id="sl-play" aria-pressed="false">Pause</button>
-    <span class="sl-count" id="sl-count">1 / ${D.galerie.length}</span>
-  </div>`:""}
-</div></section>`:""}
-${D.coachs.length?`<section class="band${(D.galerie||[]).length?" alt":""}" id="coachs"><div class="wrap">
+${D.coachs.length?`<section class="band alt" id="coachs"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">L’encadrement</div><h2>Coachs &amp; bureau</h2></div></div>
   <div class="coachs">${D.coachs.map(k=>`<div class="coach-card">${k.photo?`<img class="avatar" src="${esc(imgSrc(k.photo))}" alt="${esc(k.nom)}">`:`<div class="ini">${esc(initials(k.nom))}</div>`}<h3>${esc(k.nom)}</h3><div class="role">${esc(k.role)}</div><p>${esc(k.bio)}</p></div>`).join("")}</div>
 </div></section>`:""}
-
-<section class="band${D.coachs.length?" alt":""}" id="tenue"><div class="wrap kit">
+<section class="band${D.coachs.length?"":" alt"}" id="tenue"><div class="wrap kit">
   <div>
     <div class="eyebrow">Tenue officielle</div>
     <h2 style="font-size:clamp(34px,5vw,54px);font-weight:800;margin:8px 0 16px">Aux couleurs<br>du tigre</h2>
@@ -628,9 +645,52 @@ ${D.coachs.length?`<section class="band${(D.galerie||[]).length?" alt":""}" id="
     <ul><li class="tag">Tee-shirts</li><li class="tag">Débardeurs</li><li class="tag">Shorts de boxe</li><li class="tag">Survêtements</li><li class="tag">Casquettes</li></ul>
   </div>
   <div class="kit-photos"><img src="${IMG.cap}" alt="Casquette noire brodée du logo"><img src="${IMG.hoodie}" alt="Dos de sweat brodé du logo du club"><img src="${IMG.ring}" alt="Ring de la salle"></div>
+</div></section>`,
+    planning:()=>`<section class="band alt" id="planning"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Saison ${esc(D.saison)}</div><h2>Planning des entraînements</h2></div><p>Le jour en surbrillance, c’est aujourd’hui. Filtrez par public pour trouver votre cours.</p></div>
+  ${D.planning.length?`<div class="filters" role="group" aria-label="Filtrer par public">${pubs.map(p=>`<button class="chip" data-filter="${esc(p)}" aria-pressed="${p===filter}">${esc(p)}</button>`).join("")}</div>`:""}
+  ${hasEx?`<div class="notice"><span>⚠</span><span><b>Horaires indicatifs.</b> Les créneaux marqués « à confirmer » ne sont pas encore définitifs. Appelez le club avant votre premier cours.</span></div>`:""}
+  ${days.length?`<div class="week">${days.map(d=>`<div class="day${d===t?" today":""}"><h3>${JOURS[d]}${d===t?"<small>Aujourd’hui</small>":""}</h3>${shown.filter(s=>s.jour===d).map(s=>`
+    <div class="sess"><div class="t">${esc(s.debut)} – ${esc(s.fin)}</div><div class="c">${esc(s.cours)}</div>
+    <div class="m"><span class="pub" data-p="${esc(s.public)}">${esc(s.public)}</span>${s.exemple?'<span class="ex">à confirmer</span>':""}<button class="try" data-try="${esc(s.id)}">Essayer</button></div>
+    ${s.coach?`<div class="coach">Avec ${esc(s.coach)}</div>`:""}</div>`).join("")}</div>`).join("")}</div>`
+  :`<div class="empty"><b>Planning en préparation</b>Les horaires de la saison arrivent. En attendant, contactez le club au ${esc(c.tel)}.</div>`}
+</div></section>`,
+    tarifs:()=>`<section class="band" id="tarifs"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Rejoindre le club</div><h2>Tarifs &amp; inscription</h2></div></div>
+  <div class="tarif-grid">
+    <div class="prices">${D.tarifs.length?D.tarifs.map(p=>`<div class="price"><h3>${esc(p.formule)}</h3><div class="amt">${esc(p.prix)}</div><p>${esc(p.detail)}</p></div>`).join("")
+      :`<div class="empty"><b>Cotisations sur demande</b>Le montant des cotisations de la saison vous est communiqué par le bureau. Écrivez-nous ou appelez le ${esc(c.tel)}.</div>`}</div>
+    <aside class="docs"><h3>Documents à fournir</h3><ul>${D.documents.map(d=>`<li>${esc(d)}</li>`).join("")}</ul>
+      <div class="essai">${esc(D.essai)}</div></aside>
+  </div>
 </div></section>
-
-<section class="band alt" id="contact"><div class="wrap">
+<section class="band cta-band"><div class="wrap"><div><div class="eyebrow">Avant de s’inscrire</div><h2>Essayez d’abord</h2><p>Le premier cours permet de découvrir le club et les coachs avant de prendre sa licence.</p></div><div class="cta"><a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a><a class="btn ghost" href="#planning" data-nav="planning">Voir les horaires</a></div></div></section>`,
+    agenda:()=>`<section class="band" id="agenda"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">À venir</div><h2>Agenda du club</h2></div><p>Galas, compétitions, stages et événements ouverts à tous.</p></div>
+  ${evts.length?`<div class="agenda">${evts.map(e=>{const n=daysTo(e.date);const dt=new Date(e.date+"T12:00:00");return `<article class="event">
+    <div class="cal"><b>${dt.getDate()}</b><span>${dt.toLocaleDateString("fr-FR",{month:"short"}).replace(".","")}</span></div>
+    <div style="min-width:0"><h3>${esc(e.titre)}</h3><div class="meta">${esc(dt.toLocaleDateString("fr-FR",{weekday:"long"}))}${e.heure?" · "+esc(e.heure.replace(":","h")):""}${e.lieu?" · "+esc(e.lieu):""}</div>${e.description?`<p>${esc(e.description)}</p>`:""}</div>
+    <div class="jx${n<=7?" soon":""}">${n===0?"Aujourd’hui":n===1?"Demain":"J-"+n}</div></article>`}).join("")}</div>`:`<div class="empty"><b>Pas d’événement prévu</b>Les prochains galas, stages et compétitions seront annoncés ici et sur Facebook.</div>`}
+</div></section>`,
+    actus:()=>`<section class="band alt" id="actus"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">La vie du club</div><h2>Actualités</h2></div><p>Galas, stages, événements et nouvelles de l’association.</p></div>
+  ${actus.length?`<div class="news">${actus.map(postHTML).join("")}</div>`:`<div class="empty"><b>Pas d’actualité pour le moment</b>Suivez le club sur Facebook pour ne rien manquer.</div>`}
+</div></section>`,
+    photos:()=>`<section class="band" id="photos"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><p>Entraînements, galas et moments de vie du club.</p></div>
+  ${G.length?`  <div class="slider" id="slider" role="region" aria-roledescription="carrousel" aria-label="Photos du club">
+    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="Agrandir la photo${g.legende?" : "+esc(g.legende):""}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" ${i>1?'loading="lazy"':""}></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
+    ${D.galerie.length>1?`<button class="sl-btn sl-prev" data-sl="-1" aria-label="Photo précédente">‹</button><button class="sl-btn sl-next" data-sl="1" aria-label="Photo suivante">›</button><div class="sl-progress" id="sl-progress"></div>`:""}
+  </div>
+  ${D.galerie.length>1?`<div class="sl-bar">
+    ${D.galerie.length<=15?`<div class="dots" role="group" aria-label="Choisir une photo">${D.galerie.map((_,i)=>`<button data-dot="${i}" aria-label="Photo ${i+1}"${i===0?' aria-current="true"':""}></button>`).join("")}</div>`:""}
+    <button class="btn ghost sm" id="sl-play" aria-pressed="false">Pause</button>
+    <span class="sl-count" id="sl-count">1 / ${D.galerie.length}</span>
+  </div>`:""}
+  <div class="thumbs">${G.map((g,i)=>`<button data-zoom="${i}" aria-label="Agrandir la photo ${i+1}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" loading="lazy"></button>`).join("")}</div>`:`<div class="empty"><b>Bientôt des photos</b>Les photos des entraînements et des galas arriveront ici.</div>`}
+</div></section>`,
+    contact:()=>`<section class="band alt" id="contact"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Contact &amp; accès</div><h2>Venir au club</h2></div></div>
   <div class="contact-grid">
     <div class="cards">
@@ -650,7 +710,28 @@ ${D.coachs.length?`<section class="band${(D.galerie||[]).length?" alt":""}" id="
     </div>
   </div>
   ${formHTML(D)}
-</div></section>
+</div></section>`
+  };
+  if(!P[page]) page="accueil";
+  const TITLES={accueil:"Accueil",club:"Le club",planning:"Planning",tarifs:"Inscription",agenda:"Agenda",actus:"Actus",photos:"Photos",contact:"Contact"};
+  document.title=page==="accueil"?"Montoiz Thaï Khmer Boxing":TITLES[page]+" · Montoiz Thaï Khmer Boxing";
+  document.getElementById("app").innerHTML=`
+${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><div class="wrap"><span>${esc(an.texte)}</span><button id="annonce-x" aria-label="Masquer l’annonce">×</button></div></div>`:""}
+<header class="top${menuOpen?" open":""}"><div class="wrap">
+  <a class="brand" href="#accueil" data-nav="accueil"><img src="${IMG.logo}" alt=""><span>Montoiz’<small>Thaï Khmer Boxing</small></span></a>
+  <nav class="links" aria-label="Menu principal">${navLinks.map(([id,l])=>`<a href="#${id}" data-nav="${id}">${l}</a>`).join("")}</nav>
+  <a class="btn sm nav-cta" href="#demande" data-type="essai">Cours d’essai</a>
+  <button class="burger" id="burger" aria-expanded="${menuOpen}" aria-controls="menu-panel" aria-label="${menuOpen?"Fermer le menu":"Ouvrir le menu"}"><span></span><span></span><span></span></button>
+</div></header>
+<div class="menu-panel" id="menu-panel"${menuOpen?"":" hidden"}><div class="wrap">
+  <nav aria-label="Menu">${[["accueil","Accueil","Page d’entrée"],...navLinks].map(([id,l,s])=>`<a href="#${id}" data-nav="${id}"><span>${l}</span><small>${s}</small></a>`).join("")}</nav>
+  <div class="menu-contact">
+    <a class="btn" href="#demande" data-type="essai">Réserver un cours d’essai</a>
+    <p><b>${esc(c.tel)}</b><br>${esc(c.adresse)}, ${esc(c.ville)}</p>
+  </div>
+</div></div>
+<div class="mongkol" aria-hidden="true"></div>
+<main id="main" class="page" data-page="${page}">${P[page]()}</main>
 
 <footer><div class="wrap">
   <span>© ${new Date().getFullYear()} ${esc(c.nom)} · Association sportive · ${esc(c.ville)}</span>
@@ -854,7 +935,7 @@ const BLANK={planning:()=>({id:uid(),jour:0,debut:"18:00",fin:"19:00",cours:"",p
 
 document.addEventListener("click",e=>{
   const tl=e.target.closest("a[data-type]"); if(tl){e.preventDefault();if(menuOpen)setMenu(false);goForm(tl.dataset.type);return}
-  const nl=e.target.closest("a[data-nav]"); if(nl){e.preventDefault();if(menuOpen)setMenu(false);const t=document.getElementById(nl.dataset.nav);if(t){t.scrollIntoView({behavior:RM()?"auto":"smooth"});try{history.replaceState(null,"","#"+nl.dataset.nav)}catch(_){}}slSchedule();return}
+  const nl=e.target.closest("a[data-nav]"); if(nl){e.preventDefault();go(nl.dataset.nav);return}
   const el=e.target.closest("button,[data-filter]"); if(!el) return;
   if(el.dataset.filter){filter=el.dataset.filter;render();return}
   if(el.id==="annonce-x"){try{localStorage.setItem("mtkb-annonce",String(hashStr(DATA.annonce.texte)))}catch(_){}el.closest(".annonce").remove();return}
@@ -875,7 +956,7 @@ document.addEventListener("click",e=>{
   if(el.id==="open-admin"){openAdmin();return}
   if(el.id==="gh-save"){GH.owner=document.getElementById("gh-owner").value.trim();GH.repo=document.getElementById("gh-repo").value.trim();GH.token=document.getElementById("gh-token").value.trim();storeGH();tab=GH.token?"infos":"connexion";renderAdmin();toast(GH.token?"Connexion enregistrée sur cet appareil.":"Collez un jeton pour vous connecter.");return}
   if(el.id==="gh-logout"){GH.token="";storeGH();renderAdmin();toast("Jeton supprimé de cet appareil.");return}
-  if(el.id==="close-admin"){draft=null;dirty=false;confirmDel=null;if(location.hash==="#bureau")history.replaceState(null,"",location.pathname+location.search);renderAdmin();return}
+  if(el.id==="close-admin"){draft=null;dirty=false;confirmDel=null;if(location.hash==="#bureau")history.replaceState(null,"",page==="accueil"?location.pathname+location.search:"#"+page);renderAdmin();return}
   if(el.id==="save-admin"){save();return}
   if(el.dataset.tab){tab=el.dataset.tab;confirmDel=null;renderAdmin();return}
   if(el.dataset.add){const l=el.dataset.add;const it=BLANK[l]();l==="actus"||l==="agenda"?draft[l].unshift(it):draft[l].push(it);dirty=true;renderAdmin();return}
@@ -902,7 +983,14 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.dataset&&t.dataset.photo&&draft){const fs=[...t.files].slice(0,1);const path=t.dataset.photo;t.value="";handleFiles(fs,p=>setPath(draft,path,p));return}if(draft&&t.dataset&&t.dataset.path&&(t.tagName==="SELECT"||t.dataset.bool))renderAdmin()});
 
 function openAdmin(){draft=JSON.parse(JSON.stringify(DATA));draft.agenda=draft.agenda||[];draft.annonce=Object.assign({texte:"",actif:false,type:"info",jusqu:""},draft.annonce);draft.legal=Object.assign({president:"",rna:"",siret:""},draft.legal);draft.galerie=draft.galerie||[];dirty=false;confirmDel=null;tab=GH.token?"infos":"connexion";renderAdmin()}
-function checkHash(){if(location.hash==="#bureau"){canWrite=true;render();if(!draft)openAdmin()}else if(location.hash==="#mentions"){showLegal()}}
+function checkHash(){
+  if(location.hash==="#bureau"){canWrite=true;render();if(!draft)openAdmin();return}
+  if(location.hash==="#mentions"){showLegal();return}
+  if(document.querySelector(".legal"))document.querySelector(".legal").remove(),document.body.style.overflow="";
+  const p=pageFromHash()||"accueil";
+  if(location.hash==="#demande"){if(page!=="contact"){page="contact";render()}setTimeout(()=>document.getElementById("demande")?.scrollIntoView(),50);return}
+  if(p!==page){page=p;SL.i=0;render();window.scrollTo(0,0)}
+}
 canWrite=!!GH.token;
 render();
 fetch("donnees.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j){DATA=j;if(!draft)render()}}).catch(()=>{}).finally(checkHash);
