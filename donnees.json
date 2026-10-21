@@ -1,6 +1,6 @@
 {
   "saison": "2026-2027",
-  "maj": "2026-10-20",
+  "maj": "2026-10-21",
   "club": {
     "nom": "Montoiz’ Thaï Khmer Boxing",
     "accroche": "Boxe thaï, boxe khmère et boxes d’Asie du Sud-Est à Montoison, pour les enfants comme pour les adultes.",
@@ -98,5 +98,26 @@
     "rna": "",
     "siret": ""
   },
-  "galerie": []
+  "galerie": [
+    {
+      "id": "c1hcsme",
+      "src": "photos/2026-10-21-eucysjc.jpg",
+      "legende": ""
+    },
+    {
+      "id": "vai8qi9",
+      "src": "photos/2026-10-21-eg4cqci.jpg",
+      "legende": ""
+    },
+    {
+      "id": "hd7xmt2",
+      "src": "photos/2026-10-21-6nk50yq.jpg",
+      "legende": ""
+    },
+    {
+      "id": "ss70wp9",
+      "src": "photos/2026-10-21-09jkxrt.jpg",
+      "legende": ""
+    }
+  ]
 }
