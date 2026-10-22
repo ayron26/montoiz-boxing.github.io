@@ -67,6 +67,13 @@
   "essai": "Envie d’essayer ? Contactez le club par téléphone, WhatsApp ou e-mail pour convenir d’un cours d’essai.",
   "actus": [
     {
+      "id": "actu-affiliation-2026",
+      "date": "2026-10-22",
+      "titre": "Le club s’affilie à la FFKMDA et à la WMO France",
+      "photo": "",
+      "texte": "Une étape importante pour Montoiz’ Thaï Khmer Boxing : cette saison, le club a décidé de s’affilier à la FFKMDA, la Fédération Française de Kick Boxing, Muay Thaï et Disciplines Associées.\n\nLa FFKMDA est la fédération reconnue et agréée par l’État pour nos disciplines. Grâce à cette affiliation, nos boxeuses et nos boxeurs pourront participer aux différentes compétitions officielles : championnats régionaux, championnats de France et rencontres interclubs.\n\nPour aller encore plus loin, le club s’affilie également à la WMO France, présidée par Madame France Bonnet. La WMO France est placée sous la tutelle de la WMO (World Muaythai Organization), présidée par Chinawut Sirisompan, plus connu sous le nom de Grand Master Woody, maître de muay thaï et de muay boran, la boxe thaïe ancienne.\n\nCette double affiliation ouvre à nos compétiteurs les portes de compétitions supplémentaires, jusqu’au niveau international.\n\nUn grand merci à tous les adhérents, parents, bénévoles et partenaires qui font grandir le club. Une nouvelle page s’écrit : à nous de la remplir de beaux combats !"
+    },
+    {
       "id": "a3",
       "date": "2026-10-20",
       "titre": "La tenue officielle du club est arrivée",
@@ -125,5 +132,86 @@
       "src": "photos/2026-10-21-09jkxrt.jpg",
       "legende": ""
     }
-  ]
+  ],
+  "seeds": [
+    "affil-2026",
+    "boutique-2026"
+  ],
+  "affiliations": [
+    {
+      "id": "ffkmda",
+      "sigle": "FFKMDA",
+      "nom": "Fédération Française de Kick Boxing, Muay Thaï et Disciplines Associées",
+      "texte": "Fédération reconnue et agréée par l’État. Elle permet à nos boxeuses et boxeurs de participer aux compétitions officielles, jusqu’aux championnats de France.",
+      "url": "https://www.ffkmda.com",
+      "logo": ""
+    },
+    {
+      "id": "wmo-france",
+      "sigle": "WMO France",
+      "nom": "World Muaythai Organization – France",
+      "texte": "Présidée par Madame France Bonnet, sous la tutelle de la WMO de Grand Master Woody. Elle ouvre l’accès à des compétitions internationales de muay thaï et de muay boran.",
+      "url": "https://www.wmomuaythai.org",
+      "logo": ""
+    }
+  ],
+  "boutique": {
+    "actif": true,
+    "intro": "Les textiles officiels du club, fabriqués par Atelier Mirabel à Valence. Commandez en ligne et récupérez votre commande à la salle.",
+    "paiement": "Paiement au moment du retrait à la salle (espèces ou chèque à l’ordre du club).",
+    "lienPaiement": "",
+    "email": "",
+    "articles": [
+      {
+        "id": "tshirt",
+        "nom": "Tee-shirt du club",
+        "description": "Tee-shirt noir, logo du tigre brodé.",
+        "photo": "",
+        "prixAdh": "",
+        "prixPub": "",
+        "tailles": "6 ans,8 ans,10 ans,12 ans,14 ans,XS,S,M,L,XL,XXL",
+        "dispo": true
+      },
+      {
+        "id": "debardeur",
+        "nom": "Débardeur",
+        "description": "Idéal pour l’entraînement.",
+        "photo": "",
+        "prixAdh": "",
+        "prixPub": "",
+        "tailles": "XS,S,M,L,XL,XXL",
+        "dispo": true
+      },
+      {
+        "id": "short",
+        "nom": "Short de boxe",
+        "description": "Short de muay thaï aux couleurs du club.",
+        "photo": "",
+        "prixAdh": "",
+        "prixPub": "",
+        "tailles": "6 ans,8 ans,10 ans,12 ans,14 ans,XS,S,M,L,XL,XXL",
+        "dispo": true
+      },
+      {
+        "id": "survet",
+        "nom": "Survêtement",
+        "description": "Sweat à capuche brodé dans le dos et pantalon assorti.",
+        "photo": "builtin:hoodie",
+        "prixAdh": "",
+        "prixPub": "",
+        "tailles": "6 ans,8 ans,10 ans,12 ans,14 ans,XS,S,M,L,XL,XXL",
+        "dispo": true
+      },
+      {
+        "id": "casquette",
+        "nom": "Casquette brodée",
+        "description": "Casquette noire, logo brodé.",
+        "photo": "builtin:cap",
+        "prixAdh": "",
+        "prixPub": "",
+        "tailles": "Taille unique",
+        "dispo": true
+      }
+    ]
+  }
 }
