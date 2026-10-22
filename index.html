@@ -359,6 +359,24 @@ nav.links a[aria-current="page"]::after{transform:scaleX(1)}
 .sheet-box p{margin:0;color:var(--muted);font-size:14px}
 .ico{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:6px;background:var(--bg-3);border:1px solid var(--line);vertical-align:middle;font-size:15px;margin:0 2px}
 @media (min-width:700px){.sheet{align-items:center}}
+/* Affiliations */
+.affils{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.affil{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:start;padding:20px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);min-width:0}
+.alogo{width:96px;height:96px;border-radius:12px;background:#f7f2e8;display:grid;place-items:center;padding:10px;overflow:hidden}
+.alogo img{max-width:100%;max-height:100%;object-fit:contain}
+.alogo b{font-family:var(--f-display);font-weight:900;font-size:22px;line-height:.95;color:#1a1206;text-align:center;text-transform:uppercase;overflow-wrap:anywhere}
+.affil h3{font-size:30px;font-weight:800}
+.affil .full{font-family:var(--f-label);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-2);margin:4px 0 8px}
+.affil p{margin:0 0 10px;color:var(--muted);font-size:15px}
+.affil a{font-family:var(--f-label);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+@media (max-width:480px){.affil{grid-template-columns:1fr}.alogo{width:80px;height:80px}}
+.affil-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 28px;padding-block:22px}
+.affil-strip .eyebrow{color:var(--muted)}
+.affil-strip a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--fg);font-family:var(--f-display);font-weight:800;font-size:22px;text-transform:uppercase}
+.affil-strip .alogo{width:48px;height:48px;padding:5px;border-radius:8px}
+.affil-strip .alogo b{font-size:11px}
+.foot-affil{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-family:var(--f-label);letter-spacing:.1em;text-transform:uppercase;font-size:13px}
+.foot-affil a{color:var(--gold-2);text-decoration:none}
 /* Demande */
 .ask{margin-top:28px;display:grid;grid-template-columns:1fr 1.6fr;gap:28px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:24px;scroll-margin-top:80px}
 .ask h3{font-size:clamp(30px,4vw,42px);font-weight:800;margin:8px 0 12px}
@@ -429,6 +447,18 @@ const RESET=':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);p
 const JOURS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 const PUBLICS=["Enfants","Ados","Adultes","Femmes","Compétition","Tous"];
 let DATA=JSON.parse(document.getElementById("club-data").textContent);
+const SEEDS=[
+  {id:"affil-2026",run(D){
+    D.actus=D.actus||[];
+    if(!D.actus.some(a=>a.id==="actu-affiliation-2026")) D.actus.unshift({id:"actu-affiliation-2026",date:"2026-10-22",titre:"Le club s’affilie à la FFKMDA et à la WMO France",photo:"",
+      texte:"Une étape importante pour Montoiz’ Thaï Khmer Boxing : cette saison, le club a décidé de s’affilier à la FFKMDA, la Fédération Française de Kick Boxing, Muay Thaï et Disciplines Associées.\n\nLa FFKMDA est la fédération reconnue et agréée par l’État pour nos disciplines. Grâce à cette affiliation, nos boxeuses et nos boxeurs pourront participer aux différentes compétitions officielles : championnats régionaux, championnats de France et rencontres interclubs.\n\nPour aller encore plus loin, le club s’affilie également à la WMO France, présidée par Madame France Bonnet. La WMO France est placée sous la tutelle de la WMO (World Muaythai Organization), présidée par Chinawut Sirisompan, plus connu sous le nom de Grand Master Woody, maître de muay thaï et de muay boran, la boxe thaïe ancienne.\n\nCette double affiliation ouvre à nos compétiteurs les portes de compétitions supplémentaires, jusqu’au niveau international.\n\nUn grand merci à tous les adhérents, parents, bénévoles et partenaires qui font grandir le club. Une nouvelle page s’écrit : à nous de la remplir de beaux combats !"});
+    D.affiliations=D.affiliations||[];
+    if(!D.affiliations.some(a=>a.id==="ffkmda")) D.affiliations.push({id:"ffkmda",sigle:"FFKMDA",nom:"Fédération Française de Kick Boxing, Muay Thaï et Disciplines Associées",texte:"Fédération reconnue et agréée par l’État. Elle permet à nos boxeuses et boxeurs de participer aux compétitions officielles, jusqu’aux championnats de France.",url:"https://www.ffkmda.com",logo:""});
+    if(!D.affiliations.some(a=>a.id==="wmo-france")) D.affiliations.push({id:"wmo-france",sigle:"WMO France",nom:"World Muaythai Organization – France",texte:"Présidée par Madame France Bonnet, sous la tutelle de la WMO de Grand Master Woody. Elle ouvre l’accès à des compétitions internationales de muay thaï et de muay boran.",url:"https://www.wmomuaythai.org",logo:""});
+  }}
+];
+function applySeeds(D){D.seeds=D.seeds||[];for(const s of SEEDS){if(!D.seeds.includes(s.id)){s.run(D);D.seeds.push(s.id)}}return D}
+applySeeds(DATA);
 let filter="Tous";
 let draft=null, tab="infos", dirty=false, canWrite=false, artifactNS=null, confirmDel=null, saving=false;
 
@@ -663,6 +693,13 @@ function openLightbox(i){
 }
 function closeLightbox(){document.querySelector(".lightbox")?.remove();if(!draft&&!menuOpen)document.body.style.overflow="";slSchedule()}
 
+function affilLogo(a){return `<span class="alogo">${a.logo?`<img src="${esc(imgSrc(a.logo))}" alt="Logo ${esc(a.sigle||a.nom)}" loading="lazy">`:`<b>${esc(a.sigle||a.nom)}</b>`}</span>`}
+function affilSection(D,alt){const A=D.affiliations||[];if(!A.length)return "";
+  return `<section class="band${alt?" alt":""}" id="affiliations"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Club affilié</div><h2>Nos affiliations</h2></div><p>Le club est affilié à des fédérations reconnues : nos boxeurs peuvent participer aux compétitions officielles, en France et à l’international.</p></div>
+  <div class="affils">${A.map(a=>`<article class="affil">${affilLogo(a)}<div style="min-width:0"><h3>${esc(a.sigle||a.nom)}</h3>${a.sigle&&a.nom&&a.nom!==a.sigle?`<div class="full">${esc(a.nom)}</div>`:""}${a.texte?`<p>${esc(a.texte)}</p>`:""}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">Site officiel →</a>`:""}</div></article>`).join("")}</div>
+</div></section>`}
+
 function render(){
   const D=DATA, c=D.club;
   const sessions=[...D.planning].sort((a,b)=>a.jour-b.jour||a.debut.localeCompare(b.debut));
@@ -712,6 +749,7 @@ function render(){
     <a class="tile" href="#contact" data-nav="contact"><span class="eyebrow">Venir au club</span><b>${esc(c.ville.replace(/^\d+\s*/,""))}</b><span>${esc(c.adresse)}</span><i>Itinéraire et contact →</i></a>
   </div>
 </div></section>
+${(D.affiliations||[]).length?`<section class="band"><div class="wrap affil-strip"><span class="eyebrow">Club affilié</span>${D.affiliations.map(a=>`<a href="#club" data-nav="club" title="${esc(a.nom||a.sigle)}">${a.logo?affilLogo(a):""}<span>${esc(a.sigle||a.nom)}</span></a>`).join("")}</div></section>`:""}
 
 ${actus.length?`<section class="band"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">La vie du club</div><h2>Dernières actus</h2></div><a class="btn ghost sm" href="#actus" data-nav="actus">Toutes les actus →</a></div>
@@ -763,7 +801,8 @@ ${D.coachs.length?`<section class="band alt" id="coachs"><div class="wrap">
     <ul><li class="tag">Tee-shirts</li><li class="tag">Débardeurs</li><li class="tag">Shorts de boxe</li><li class="tag">Survêtements</li><li class="tag">Casquettes</li></ul>
   </div>
   <div class="kit-photos"><img src="${IMG.cap}" alt="Casquette noire brodée du logo"><img src="${IMG.hoodie}" alt="Dos de sweat brodé du logo du club"><img src="${IMG.ring}" alt="Ring de la salle"></div>
-</div></section>`,
+</div></section>
+${affilSection(D,false)}`,
     planning:()=>`<section class="band alt" id="planning"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Saison ${esc(D.saison)}</div><h2>Planning des entraînements</h2></div><p>Le jour en surbrillance, c’est aujourd’hui. Filtrez par public pour trouver votre cours.</p></div>
   ${D.planning.length?`<div class="filters" role="group" aria-label="Filtrer par public">${pubs.map(p=>`<button class="chip" data-filter="${esc(p)}" aria-pressed="${p===filter}">${esc(p)}</button>`).join("")}</div>`:""}
@@ -854,6 +893,7 @@ ${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><
 
 <footer><div class="wrap">
   <span>© ${new Date().getFullYear()} ${esc(c.nom)} · Association sportive · ${esc(c.ville)}</span>
+  ${(D.affiliations||[]).length?`<span class="foot-affil">Club affilié : ${D.affiliations.map(a=>a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.sigle||a.nom)}</a>`:esc(a.sigle||a.nom)).join(" · ")}</span>`:""}
   <span class="flags">France · Thaïlande · Cambodge</span><a href="#mentions">Mentions légales &amp; confidentialité</a>
   <button class="btn ghost sm install-btn" data-install${isStandalone()?" hidden":""}>📲 Installer l’appli</button>
   <span>Mis à jour le ${esc(fmtDate(D.maj))} · <a href="#bureau">Espace bureau</a></span>
@@ -865,7 +905,7 @@ ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 }
 
 /* ---------- Admin ---------- */
-const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["galerie","Photos"],["annonce","Annonce"],["agenda","Agenda"],["coachs","Coachs & bureau"],["legal","Mentions légales"]];
+const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["galerie","Photos"],["annonce","Annonce"],["agenda","Agenda"],["coachs","Coachs & bureau"],["affiliations","Affiliations"],["legal","Mentions légales"]];
 const field=(label,path,val,opts={})=>{
   const id="f-"+path.replace(/[^\w]/g,"-");
   const cls=opts.full?"f full":"f";
@@ -951,6 +991,14 @@ function adminTab(){
       ${field("Titre",`agenda.${i}.titre`,e.titre,{ph:"Gala de boxe, stage, compétition…"})}${field("Lieu",`agenda.${i}.lieu`,e.lieu,{ph:"Salle de Montoison"})}
       ${field("Description",`agenda.${i}.description`,e.description,{type:"textarea",full:1})}
     </div></div>`).join("")}`;
+  if(tab==="affiliations"){d.affiliations=d.affiliations||[];return `<p class="help">Fédérations, ligues et partenaires officiels. Ils apparaissent sur la page Le club, sur l’accueil et en bas de chaque page. Utilisez les logos officiels fournis par chaque fédération (PNG de préférence).</p>
+    ${d.affiliations.map((a,i)=>`<div class="item"><div class="item-head"><b>${esc(a.sigle||a.nom||"Nouvelle affiliation")}</b>${delBtn("affiliations",i)}</div><div class="fgrid">
+      ${field("Sigle (nom court)",`affiliations.${i}.sigle`,a.sigle,{ph:"FFKMDA"})}${field("Lien du site officiel",`affiliations.${i}.url`,a.url,{type:"url",ph:"https://…"})}
+      ${field("Nom complet",`affiliations.${i}.nom`,a.nom,{full:1})}
+      ${field("Présentation",`affiliations.${i}.texte`,a.texte,{type:"textarea",full:1})}
+      ${GH.token?photoField("Logo",`affiliations.${i}.logo`,a.logo):'<p class="help full">Connectez-vous (onglet Connexion) pour ajouter le logo.</p>'}
+    </div></div>`).join("")}
+    <button class="btn ghost" data-add="affiliations">+ Ajouter une affiliation ou un partenaire</button>`}
   if(tab==="legal") return `<p class="help">Ces informations complètent la page « Mentions légales &amp; confidentialité » (lien en bas du site). Le numéro RNA figure sur le récépissé de déclaration de l’association en préfecture.</p>
     <div class="fgrid">${field("Président(e) de l’association","legal.president",d.legal.president,{ph:"Prénom Nom"})}${field("N° RNA","legal.rna",d.legal.rna,{ph:"W261234567"})}
     ${field("SIRET (si l’asso en a un)","legal.siret",d.legal.siret)}</div>`;
@@ -1030,11 +1078,12 @@ async function shrink(file){
   const max=1600,w=src.width,h=src.height,k=Math.min(1,max/Math.max(w,h));
   const c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);
   c.getContext("2d").drawImage(src,0,0,c.width,c.height);
-  return c.toDataURL("image/jpeg",0.82);
+  const png=file.type==="image/png"||file.type==="image/svg+xml"||file.type==="image/webp";
+  return c.toDataURL(png?"image/png":"image/jpeg",0.85);
 }
 async function uploadPhoto(file){
   const dataUrl=await shrink(file);
-  const path=`photos/${new Date().toISOString().slice(0,10)}-${uid()}.jpg`;
+  const path=`photos/${new Date().toISOString().slice(0,10)}-${uid()}.${dataUrl.startsWith("data:image/png")?"png":"jpg"}`;
   await ghPutFile(path,dataUrl.split(",")[1],"Ajout d’une photo");
   PREV[path]=dataUrl;
   return path;
@@ -1052,7 +1101,7 @@ async function handleFiles(files,onDone){
 
 const BLANK={planning:()=>({id:uid(),jour:0,debut:"18:00",fin:"19:00",cours:"",public:"Adultes",coach:"",exemple:false}),
   tarifs:()=>({id:uid(),formule:"",prix:"",detail:""}),documents:()=>"",
-  actus:()=>({id:uid(),date:new Date().toISOString().slice(0,10),titre:"",texte:""}),coachs:()=>({id:uid(),nom:"",role:"",bio:"",photo:""}),galerie:()=>({id:uid(),src:"",legende:""}),agenda:()=>({id:uid(),date:"",heure:"",titre:"",lieu:"",description:""})};
+  actus:()=>({id:uid(),date:new Date().toISOString().slice(0,10),titre:"",texte:""}),coachs:()=>({id:uid(),nom:"",role:"",bio:"",photo:""}),affiliations:()=>({id:uid(),sigle:"",nom:"",texte:"",url:"",logo:""}),galerie:()=>({id:uid(),src:"",legende:""}),agenda:()=>({id:uid(),date:"",heure:"",titre:"",lieu:"",description:""})};
 
 document.addEventListener("click",e=>{
   const tl=e.target.closest("a[data-type]"); if(tl){e.preventDefault();if(menuOpen)setMenu(false);goForm(tl.dataset.type);return}
@@ -1121,7 +1170,7 @@ function checkHash(){
 }
 canWrite=!!GH.token;
 render();
-fetch("donnees.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j){DATA=j;if(!draft)render()}}).catch(()=>{}).finally(checkHash);
+fetch("donnees.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j){DATA=applySeeds(j);if(!draft)render()}}).catch(()=>{}).finally(checkHash);
 addEventListener("hashchange",checkHash);
 </script></body>
 </html>
