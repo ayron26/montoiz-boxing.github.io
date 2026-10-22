@@ -377,6 +377,46 @@ nav.links a[aria-current="page"]::after{transform:scaleX(1)}
 .affil-strip .alogo b{font-size:11px}
 .foot-affil{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-family:var(--f-label);letter-spacing:.1em;text-transform:uppercase;font-size:13px}
 .foot-affil a{color:var(--gold-2);text-decoration:none}
+/* Boutique */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:16px}
+.prod{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);overflow:hidden;min-width:0}
+.prod .pimg{aspect-ratio:1;background:radial-gradient(circle at 50% 45%,#2a1f10,#0d0b09 70%);display:grid;place-items:center;overflow:hidden}
+.prod .pimg img{width:100%;height:100%;object-fit:cover}
+.prod .pimg img.plogo{width:55%;height:auto;object-fit:contain;opacity:.4}
+.prod .pbody{padding:16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.prod h3{font-size:28px;font-weight:800}
+.prod p{margin:0;color:var(--muted);font-size:15px}
+.pprices{display:flex;gap:10px;flex-wrap:wrap}
+.price-tag{display:flex;flex-direction:column;padding:6px 10px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.price-tag small{font-family:var(--f-label);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.price-tag b{font-family:var(--f-display);font-weight:900;font-size:26px;line-height:1;font-variant-numeric:tabular-nums}
+.price-tag.adh{border-color:var(--gold)}.price-tag.adh b{color:var(--gold)}
+.prod .buy{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-top:auto}
+.prod .buy .btn{grid-column:1/-1;justify-content:center}
+.prod.off{opacity:.55}
+.soldout{font-family:var(--f-label);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.cart{margin-top:32px;display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:start;scroll-margin-top:80px}
+.cart-box{border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:20px;min-width:0}
+.cart-box h3{font-size:30px;font-weight:800;margin-bottom:12px}
+.cline{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.cline .cn{min-width:0}.cline .cn b{display:block}.cline .cn span{color:var(--muted);font-size:14px}
+.qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px}
+.qty button{all:unset;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;font-size:18px;color:var(--gold-2)}
+.qty button:focus-visible{outline:2px solid var(--gold-2)}
+.qty span{min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+.cline .ct{font-variant-numeric:tabular-nums;font-weight:600;min-width:64px;text-align:right}
+.ctotal{display:flex;justify-content:space-between;align-items:baseline;padding-top:14px}
+.ctotal b{font-family:var(--f-display);font-weight:900;font-size:36px;color:var(--gold);font-variant-numeric:tabular-nums}
+.cdel{all:unset;cursor:pointer;color:var(--muted);font-size:13px;text-decoration:underline}
+.cart-fab{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.status-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.status-pick label{cursor:pointer;position:relative}
+.status-pick input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0}
+.status-pick span{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:var(--f-label);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:14px;color:var(--muted);text-align:center}
+.status-pick input:checked + span{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--fg)}
+.status-pick input:focus-visible + span{outline:2px solid var(--gold-2)}
+.preview-note{border:1px dashed var(--gold);border-radius:var(--r);padding:12px 14px;margin-bottom:18px;color:var(--gold-2);font-size:15px}
+@media (max-width:860px){.cart{grid-template-columns:1fr}}
 /* Demande */
 .ask{margin-top:28px;display:grid;grid-template-columns:1fr 1.6fr;gap:28px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:24px;scroll-margin-top:80px}
 .ask h3{font-size:clamp(30px,4vw,42px);font-weight:800;margin:8px 0 12px}
@@ -457,6 +497,19 @@ const SEEDS=[
     if(!D.affiliations.some(a=>a.id==="wmo-france")) D.affiliations.push({id:"wmo-france",sigle:"WMO France",nom:"World Muaythai Organization – France",texte:"Présidée par Madame France Bonnet, sous la tutelle de la WMO de Grand Master Woody. Elle ouvre l’accès à des compétitions internationales de muay thaï et de muay boran.",url:"https://www.wmomuaythai.org",logo:""});
   }}
 ];
+SEEDS.push({id:"boutique-2026",run(D){
+  if(D.boutique) return;
+  const enf="6 ans,8 ans,10 ans,12 ans,14 ans",adu="XS,S,M,L,XL,XXL";
+  D.boutique={actif:false,intro:"Les textiles officiels du club, fabriqués par Atelier Mirabel à Valence. Commandez en ligne et récupérez votre commande à la salle.",
+    paiement:"Paiement au moment du retrait à la salle (espèces ou chèque à l’ordre du club).",lienPaiement:"",email:"",
+    articles:[
+      {id:"tshirt",nom:"Tee-shirt du club",description:"Tee-shirt noir, logo du tigre brodé.",photo:"",prixAdh:"",prixPub:"",tailles:enf+","+adu,dispo:true},
+      {id:"debardeur",nom:"Débardeur",description:"Idéal pour l’entraînement.",photo:"",prixAdh:"",prixPub:"",tailles:adu,dispo:true},
+      {id:"short",nom:"Short de boxe",description:"Short de muay thaï aux couleurs du club.",photo:"",prixAdh:"",prixPub:"",tailles:enf+","+adu,dispo:true},
+      {id:"survet",nom:"Survêtement",description:"Sweat à capuche brodé dans le dos et pantalon assorti.",photo:"builtin:hoodie",prixAdh:"",prixPub:"",tailles:enf+","+adu,dispo:true},
+      {id:"casquette",nom:"Casquette brodée",description:"Casquette noire, logo brodé.",photo:"builtin:cap",prixAdh:"",prixPub:"",tailles:"Taille unique",dispo:true}
+    ]};
+}});
 function applySeeds(D){D.seeds=D.seeds||[];for(const s of SEEDS){if(!D.seeds.includes(s.id)){s.run(D);D.seeds.push(s.id)}}return D}
 applySeeds(DATA);
 let filter="Tous";
@@ -546,7 +599,7 @@ function legalHTML(){
   <h3>Hébergement</h3>
   <p>GitHub Pages, service de GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
   <h3>Données personnelles</h3>
-  <p>Les informations saisies dans le formulaire de contact (nom, téléphone, e-mail, message, âge de l’enfant le cas échéant) sont transmises par e-mail au bureau de l’association via le service FormSubmit. Elles servent uniquement à répondre à votre demande et à organiser votre accueil au club. Elles ne sont ni vendues ni cédées.</p>
+  <p>Les informations saisies dans le formulaire de contact (nom, téléphone, e-mail, message, âge de l’enfant le cas échéant) sont transmises par e-mail au bureau de l’association via le service FormSubmit. Les commandes passées dans la boutique (nom, téléphone, e-mail, articles) sont transmises de la même façon au bureau, uniquement pour préparer et remettre la commande. Elles servent uniquement à répondre à votre demande et à organiser votre accueil au club. Elles ne sont ni vendues ni cédées.</p>
   <p>Elles sont conservées au plus tard 3 ans après le dernier contact, sauf si vous devenez adhérent : les données d’adhésion sont alors conservées pendant la durée de l’adhésion.</p>
   <p>Conformément au RGPD, vous pouvez accéder à vos données, les faire rectifier ou supprimer, ou vous opposer à leur traitement en écrivant à ${esc(c.email)}. Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).</p>
   <h3>Cookies et services tiers</h3>
@@ -580,7 +633,7 @@ async function installApp(){
   document.body.appendChild(s);document.body.style.overflow="hidden";document.getElementById("sheet-x").focus();
 }
 if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
-const PAGES=["accueil","club","planning","tarifs","agenda","actus","photos","contact"];
+const PAGES=["accueil","club","planning","tarifs","agenda","actus","photos","boutique","contact"];
 const pageFromHash=()=>{const x=location.hash.slice(1);return PAGES.includes(x)?x:(x==="demande"?"contact":null)};
 let page=pageFromHash()||"accueil";
 function nextSession(list){
@@ -700,6 +753,95 @@ function affilSection(D,alt){const A=D.affiliations||[];if(!A.length)return "";
   <div class="affils">${A.map(a=>`<article class="affil">${affilLogo(a)}<div style="min-width:0"><h3>${esc(a.sigle||a.nom)}</h3>${a.sigle&&a.nom&&a.nom!==a.sigle?`<div class="full">${esc(a.nom)}</div>`:""}${a.texte?`<p>${esc(a.texte)}</p>`:""}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">Site officiel →</a>`:""}</div></article>`).join("")}</div>
 </div></section>`}
 
+/* ===== Boutique ===== */
+const shopOpen=D=>{const B=D.boutique;return !!(B&&(B.articles||[]).length&&(B.actif||canWrite))};
+const eur=n=>(Math.round(n*100)/100).toLocaleString("fr-FR",{style:"currency",currency:"EUR",minimumFractionDigits:Number.isInteger(n)?0:2});
+const num=v=>{const x=parseFloat(String(v).replace(",","."));return isFinite(x)?x:null};
+let CART=[];try{CART=JSON.parse(localStorage.getItem("mtkb-cart")||"[]")||[]}catch(_){CART=[]}
+const saveCart=()=>{try{localStorage.setItem("mtkb-cart",JSON.stringify(CART))}catch(_){}};
+const ORDER={statut:"adherent",nom:"",tel:"",email:"",message:"",ok:false,status:"idle",err:"",num:"",recap:"",total:0};
+function unitPrice(a){const adh=num(a.prixAdh),pub=num(a.prixPub);return ORDER.statut==="adherent"?(adh??pub):(pub??adh)}
+function cartLines(D){const A=(D.boutique||{}).articles||[];return CART.map((l,i)=>{const a=A.find(x=>x.id===l.aid);if(!a)return null;const u=unitPrice(a);return{i,a,taille:l.taille,qty:l.qty,u,t:u==null?null:u*l.qty}}).filter(Boolean)}
+function cartHTML(D){
+  const B=D.boutique,c=D.club,L=cartLines(D),tot=L.reduce((s,l)=>s+(l.t||0),0),unknown=L.some(l=>l.t==null);
+  if(ORDER.status==="sent") return `<div class="cart" id="panier"><div class="cart-box form-ok"><b>Commande envoyée</b>Merci ${esc(ORDER.nom.split(" ")[0])} ! Votre commande <strong>${esc(ORDER.num)}</strong> est bien transmise au club, qui vous contacte quand elle est prête à la salle.<p style="margin:12px 0 0;color:var(--muted)">${esc(B.paiement||"")}</p>${B.lienPaiement?`<div class="cta" style="margin-top:14px"><a class="btn" href="${esc(B.lienPaiement)}" target="_blank" rel="noopener">Payer en ligne (${eur(ORDER.total)})</a></div>`:""}<div style="margin-top:14px"><button class="btn ghost sm" id="order-new">Faire une autre commande</button></div></div></div>`;
+  return `<div class="cart" id="panier">
+  <div class="cart-box"><h3>Votre panier</h3>
+    ${L.length?L.map(l=>`<div class="cline"><div class="cn"><b>${esc(l.a.nom)}</b><span>${esc(l.taille||"")}${l.u!=null?` · ${eur(l.u)} l’unité`:" · prix à confirmer"}</span><br><button class="cdel" data-cartdel="${l.i}">Retirer</button></div>
+      <div class="qty"><button data-cartqty="${l.i}:-1" aria-label="Un de moins">−</button><span>${l.qty}</span><button data-cartqty="${l.i}:1" aria-label="Un de plus">+</button></div><div class="ct">${l.t!=null?eur(l.t):"—"}</div></div>`).join("")
+      +`<div class="ctotal"><span>Total ${ORDER.statut==="adherent"?"adhérent":"client"}${unknown?" (hors articles à prix à confirmer)":""}</span><b>${eur(tot)}</b></div>`
+      :`<p class="help" style="margin:0">Votre panier est vide. Choisissez une taille puis « Ajouter au panier ».</p>`}
+  </div>
+  <form class="cart-box" id="order-form" novalidate><h3>Vos coordonnées</h3>
+    <div class="status-pick" role="radiogroup" aria-label="Vous êtes">
+      <label><input type="radio" name="statut" value="adherent" data-order="statut"${ORDER.statut==="adherent"?" checked":""}><span>Adhérent du club</span></label>
+      <label><input type="radio" name="statut" value="client" data-order="statut"${ORDER.statut==="client"?" checked":""}><span>Client</span></label>
+    </div>
+    <div class="fgrid">
+      <label class="f full" for="or-nom">Nom et prénom *<input id="or-nom" data-order="nom" value="${esc(ORDER.nom)}" autocomplete="name"></label>
+      <label class="f" for="or-tel">Téléphone *<input id="or-tel" type="tel" data-order="tel" value="${esc(ORDER.tel)}" autocomplete="tel" inputmode="tel"></label>
+      <label class="f" for="or-email">E-mail<input id="or-email" type="email" data-order="email" value="${esc(ORDER.email)}" autocomplete="email"></label>
+      <label class="f full" for="or-msg">Précisions (facultatif)<textarea id="or-msg" data-order="message" placeholder="Prénom à broder, date de retrait souhaitée…">${esc(ORDER.message)}</textarea></label>
+      <label class="f inline full" for="or-ok"><input type="checkbox" id="or-ok" data-order="ok"${ORDER.ok?" checked":""}><span>J’accepte que le club utilise ces informations pour traiter ma commande (<a href="#mentions">confidentialité</a>). *</span></label>
+    </div>
+    <div class="hp" aria-hidden="true"><label>Ne pas remplir<input id="or-hp" tabindex="-1" autocomplete="off"></label></div>
+    <p class="help" style="margin:12px 0">${esc(B.paiement||"")}${ORDER.statut==="adherent"?" Le statut d’adhérent est vérifié au retrait.":""}</p>
+    ${ORDER.err?`<p class="form-err" role="alert">${esc(ORDER.err)}</p>`:""}
+    <button class="btn" type="submit" ${!L.length||ORDER.status==="sending"?"disabled":""}>${ORDER.status==="sending"?"Envoi…":"Envoyer la commande"}</button>
+    <p class="help" style="margin:10px 0 0">Une question ? <a href="${waHref(c.whatsapp||c.tel)}" target="_blank" rel="noopener">Écrivez au club sur WhatsApp</a>.</p>
+  </form></div>`;
+}
+function shopHTML(D){
+  const B=D.boutique||{articles:[]},A=B.articles||[];
+  if(!shopOpen(D)) return `<section class="band" id="boutique"><div class="wrap"><div class="empty"><b>Boutique bientôt ouverte</b>Les textiles du club seront bientôt disponibles à la commande.</div></div></section>`;
+  const nb=CART.reduce((s,l)=>s+l.qty,0);
+  return `<section class="band" id="boutique"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Textiles officiels</div><h2>Boutique du club</h2></div><p>${esc(B.intro||"")}</p></div>
+  ${!B.actif?`<p class="preview-note">Aperçu réservé au bureau : la boutique n’est pas encore visible du public. Ajoutez les prix puis cochez « Boutique ouverte » dans l’Espace bureau.</p>`:""}
+  <div class="shop-grid">${A.map(a=>{const adh=num(a.prixAdh),pub=num(a.prixPub);const T=String(a.tailles||"").split(",").map(s=>s.trim()).filter(Boolean);return `<article class="prod${a.dispo===false?" off":""}">
+    <div class="pimg">${a.photo?`<img src="${esc(imgSrc(a.photo))}" alt="${esc(a.nom)}" loading="lazy">`:`<img class="plogo" src="${IMG.logo}" alt="">`}</div>
+    <div class="pbody"><h3>${esc(a.nom)}</h3>${a.description?`<p>${esc(a.description)}</p>`:""}
+      <div class="pprices">${adh!=null?`<div class="price-tag adh"><small>Adhérent</small><b>${eur(adh)}</b></div>`:""}${pub!=null?`<div class="price-tag"><small>Client</small><b>${eur(pub)}</b></div>`:""}${adh==null&&pub==null?`<div class="price-tag"><small>Prix</small><b>À venir</b></div>`:""}</div>
+      ${a.dispo===false?`<span class="soldout">Momentanément indisponible</span>`:`<div class="buy">
+        ${T.length>1?`<select id="sz-${esc(a.id)}" aria-label="Taille pour ${esc(a.nom)}"><option value="">Taille…</option>${T.map(t=>`<option>${esc(t)}</option>`).join("")}</select>`:`<input id="sz-${esc(a.id)}" value="${esc(T[0]||"")}" readonly aria-label="Taille">`}
+        <input id="qt-${esc(a.id)}" type="number" min="1" max="20" value="1" inputmode="numeric" aria-label="Quantité">
+        <button class="btn sm" data-addcart="${esc(a.id)}">Ajouter au panier</button></div>`}
+    </div></article>`}).join("")}</div>
+  ${cartHTML(D)}
+</div></section>
+${nb&&ORDER.status!=="sent"?`<a class="btn cart-fab" href="#panier" data-cartgo>🛒 Panier (${nb})</a>`:""}`;
+}
+function refreshCart(){const el=document.getElementById("panier");if(!el)return;const t=document.createElement("div");t.innerHTML=cartHTML(DATA);el.replaceWith(t.firstElementChild);
+  const nb=CART.reduce((s,l)=>s+l.qty,0);let f=document.querySelector(".cart-fab");
+  if(nb&&ORDER.status!=="sent"){if(!f){f=document.createElement("a");f.className="btn cart-fab";f.href="#panier";f.dataset.cartgo="";document.getElementById("main").appendChild(f)}f.textContent=`🛒 Panier (${nb})`}else f?.remove()}
+async function sendOrder(){
+  const D=DATA,B=D.boutique,L=cartLines(D);ORDER.err="";
+  if(!L.length) ORDER.err="Votre panier est vide.";
+  else if(!ORDER.nom.trim()) ORDER.err="Indiquez votre nom.";
+  else if(!ORDER.tel.trim()) ORDER.err="Indiquez un téléphone pour que le club vous prévienne quand la commande est prête.";
+  else if(!ORDER.ok) ORDER.err="Cochez la case d’accord pour que le club puisse traiter la commande.";
+  if(ORDER.err){refreshCart();return}
+  if(document.getElementById("or-hp")?.value) return;
+  const d=new Date(),numero="MTKB-"+String(d.getDate()).padStart(2,"0")+String(d.getMonth()+1).padStart(2,"0")+"-"+Math.floor(1000+Math.random()*9000);
+  const tot=L.reduce((s,l)=>s+(l.t||0),0);
+  const recap=L.map(l=>`${l.qty} × ${l.a.nom}${l.taille?" ("+l.taille+")":""} — ${l.t!=null?eur(l.t):"prix à confirmer"}`).join("\n");
+  ORDER.status="sending";refreshCart();
+  const to=B.email||D.club.formEmail||D.club.email;
+  try{
+    const r=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(to),{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body:JSON.stringify({_subject:`[Boutique] Commande ${numero} – ${ORDER.nom} – ${eur(tot)}`,_template:"table",_captcha:"false",...(ORDER.email?{_replyto:ORDER.email}:{}),
+        "N° de commande":numero,"Statut":ORDER.statut==="adherent"?"Adhérent du club":"Client","Nom":ORDER.nom,"Téléphone":ORDER.tel,"E-mail":ORDER.email,"Articles":recap,"Total":eur(tot),"Précisions":ORDER.message})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&String(j.success)==="true"){Object.assign(ORDER,{status:"sent",num:numero,recap,total:tot});CART=[];saveCart();refreshCart();document.getElementById("panier")?.scrollIntoView({behavior:"smooth"});return}
+    throw 0;
+  }catch(_){
+    ORDER.status="idle";
+    const wa=waHref(D.club.whatsapp||D.club.tel)+"?text="+encodeURIComponent(`Bonjour, je souhaite commander (${ORDER.statut==="adherent"?"adhérent":"client"}) :\n${recap}\nTotal : ${eur(tot)}\n${ORDER.nom} – ${ORDER.tel}`);
+    ORDER.err="La commande n’a pas pu être envoyée. Réessayez, ou envoyez-la sur WhatsApp avec le lien ci-dessous.";refreshCart();
+    const e=document.querySelector("#order-form .form-err");if(e)e.insertAdjacentHTML("beforeend",` <a href="${wa}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>`);
+  }
+}
+
 function render(){
   const D=DATA, c=D.club;
   const sessions=[...D.planning].sort((a,b)=>a.jour-b.jour||a.debut.localeCompare(b.debut));
@@ -715,7 +857,7 @@ function render(){
   const evts=(D.agenda||[]).filter(e=>e.date>=todayStr).sort((a,b)=>(a.date+(a.heure||"")).localeCompare(b.date+(b.heure||"")));
   const navLinks=[["club","Le club","Disciplines et valeurs"],["planning","Planning","Horaires de la semaine"],["tarifs","Inscription","Tarifs et documents"],
     ...(evts.length?[["agenda","Agenda","Prochains événements"]]:[]),["actus","Actus","Nouvelles du club"],
-    ...((D.galerie||[]).length?[["photos","Photos","En images"]]:[]),["contact","Contact","Adresse et formulaire"]];
+    ...((D.galerie||[]).length?[["photos","Photos","En images"]]:[]),...(shopOpen(D)?[["boutique","Boutique","Textiles du club"]]:[]),["contact","Contact","Adresse et formulaire"]];
   const G=D.galerie||[];
   const nx=nextSession(D.planning);
   const postHTML=a=>`<article class="post">${a.photo?`<div class="ph"><img src="${esc(imgSrc(a.photo))}" alt="" loading="lazy"></div>`:""}<time datetime="${esc(a.date)}">${esc(fmtDate(a.date))}</time><h3>${esc(a.titre)}</h3><p>${esc(a.texte)}</p></article>`;
@@ -799,6 +941,7 @@ ${D.coachs.length?`<section class="band alt" id="coachs"><div class="wrap">
     <p>Pour unifier les tenues et affirmer l’identité du club, une tenue commune est proposée à tous les adhérents pour l’entraînement.</p>
     <p>Elle est fabriquée par un atelier drômois, Atelier Mirabel à Valence : un choix fait pour soutenir le savoir-faire local.</p>
     <ul><li class="tag">Tee-shirts</li><li class="tag">Débardeurs</li><li class="tag">Shorts de boxe</li><li class="tag">Survêtements</li><li class="tag">Casquettes</li></ul>
+    ${shopOpen(D)?`<div class="cta" style="margin-top:20px"><a class="btn" href="#boutique" data-nav="boutique">Commander à la boutique →</a></div>`:""}
   </div>
   <div class="kit-photos"><img src="${IMG.cap}" alt="Casquette noire brodée du logo"><img src="${IMG.hoodie}" alt="Dos de sweat brodé du logo du club"><img src="${IMG.ring}" alt="Ring de la salle"></div>
 </div></section>
@@ -847,6 +990,7 @@ ${affilSection(D,false)}`,
   </div>`:""}
   <div class="thumbs">${G.map((g,i)=>`<button data-zoom="${i}" aria-label="${g.type==="tiktok"?"Lire la vidéo":"Agrandir la photo"} ${i+1}">${mediaHTML(g,true)}</button>`).join("")}</div>`:`<div class="empty"><b>Bientôt des photos</b>Les photos des entraînements et des galas arriveront ici.</div>`}
 </div></section>`,
+    boutique:()=>shopHTML(D),
     contact:()=>`<section class="band alt" id="contact"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Contact &amp; accès</div><h2>Venir au club</h2></div></div>
   <div class="contact-grid">
@@ -870,7 +1014,7 @@ ${affilSection(D,false)}`,
 </div></section>`
   };
   if(!P[page]) page="accueil";
-  const TITLES={accueil:"Accueil",club:"Le club",planning:"Planning",tarifs:"Inscription",agenda:"Agenda",actus:"Actus",photos:"Photos",contact:"Contact"};
+  const TITLES={accueil:"Accueil",club:"Le club",planning:"Planning",tarifs:"Inscription",agenda:"Agenda",actus:"Actus",photos:"Photos",boutique:"Boutique",contact:"Contact"};
   document.title=page==="accueil"?"Montoiz Thaï Khmer Boxing":TITLES[page]+" · Montoiz Thaï Khmer Boxing";
   document.getElementById("app").innerHTML=`
 ${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><div class="wrap"><span>${esc(an.texte)}</span><button id="annonce-x" aria-label="Masquer l’annonce">×</button></div></div>`:""}
@@ -905,7 +1049,7 @@ ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 }
 
 /* ---------- Admin ---------- */
-const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["galerie","Photos"],["annonce","Annonce"],["agenda","Agenda"],["coachs","Coachs & bureau"],["affiliations","Affiliations"],["legal","Mentions légales"]];
+const TABS=[["connexion","Connexion"],["infos","Infos du club"],["planning","Planning"],["tarifs","Tarifs & inscription"],["actus","Actualités"],["galerie","Photos"],["annonce","Annonce"],["agenda","Agenda"],["coachs","Coachs & bureau"],["boutique","Boutique"],["affiliations","Affiliations"],["legal","Mentions légales"]];
 const field=(label,path,val,opts={})=>{
   const id="f-"+path.replace(/[^\w]/g,"-");
   const cls=opts.full?"f full":"f";
@@ -919,7 +1063,7 @@ const delBtn=(list,i)=>confirmDel===list+":"+i
   :`<button class="btn danger sm" data-ask-del="${list}:${i}">Supprimer</button>`;
 
 const PREV={};
-const imgSrc=p=>PREV[p]||p;
+const imgSrc=p=>PREV[p]||(String(p).startsWith("builtin:")?(IMG[String(p).slice(8)]||""):p);
 let uploading=0;
 const photoField=(label,path,val)=>`<div class="f full"><span>${label}</span><div class="photo-pick">${val?`<img src="${esc(imgSrc(val))}" alt="">`:'<span class="none">Aucune</span>'}
   <span class="btn ghost sm file-btn">${val?"Changer":"Choisir une photo"}<input type="file" accept="image/*" data-photo="${path}" aria-label="${label}"></span>
@@ -991,6 +1135,22 @@ function adminTab(){
       ${field("Titre",`agenda.${i}.titre`,e.titre,{ph:"Gala de boxe, stage, compétition…"})}${field("Lieu",`agenda.${i}.lieu`,e.lieu,{ph:"Salle de Montoison"})}
       ${field("Description",`agenda.${i}.description`,e.description,{type:"textarea",full:1})}
     </div></div>`).join("")}`;
+  if(tab==="boutique"){const B=d.boutique=d.boutique||{actif:false,articles:[]};B.articles=B.articles||[];return `<p class="help">Les commandes arrivent par e-mail (même service que le formulaire de contact), avec un numéro de commande. Le client paie au retrait, ou en ligne si vous indiquez un lien de paiement (HelloAsso par exemple). Laissez un prix vide s’il n’existe pas : par exemple, pas de prix client pour un article réservé aux adhérents.</p>
+    <div class="fgrid">${field("Boutique ouverte au public","boutique.actif",B.actif,{type:"checkbox",full:1})}
+    ${field("Texte d’introduction","boutique.intro",B.intro,{type:"textarea",full:1})}
+    ${field("Modalités de paiement et de retrait","boutique.paiement",B.paiement,{full:1})}
+    ${field("Lien de paiement en ligne (facultatif)","boutique.lienPaiement",B.lienPaiement,{type:"url",ph:"https://www.helloasso.com/…"})}
+    ${field("E-mail qui reçoit les commandes (facultatif)","boutique.email",B.email,{type:"email",ph:D0().club.formEmail||D0().club.email})}</div>
+    <h3 style="font-size:24px;margin:24px 0 10px">Articles</h3>
+    ${B.articles.map((a,i)=>`<div class="item"><div class="item-head"><b>${esc(a.nom||"Nouvel article")}</b><span style="display:flex;gap:6px;flex-wrap:wrap">${i>0?`<button class="btn ghost sm" data-amove="${i}:-1">↑</button>`:""}${i<B.articles.length-1?`<button class="btn ghost sm" data-amove="${i}:1">↓</button>`:""}${delBtn("boutique.articles",i)}</span></div><div class="fgrid">
+      ${field("Nom de l’article",`boutique.articles.${i}.nom`,a.nom,{full:1})}
+      ${field("Prix adhérent (€)",`boutique.articles.${i}.prixAdh`,a.prixAdh,{ph:"15"})}${field("Prix client (€)",`boutique.articles.${i}.prixPub`,a.prixPub,{ph:"20"})}
+      ${field("Tailles (séparées par des virgules)",`boutique.articles.${i}.tailles`,a.tailles,{full:1,ph:"S, M, L, XL"})}
+      ${field("Description",`boutique.articles.${i}.description`,a.description,{full:1})}
+      ${field("Disponible",`boutique.articles.${i}.dispo`,a.dispo!==false,{type:"checkbox",full:1})}
+      ${GH.token?photoField("Photo",`boutique.articles.${i}.photo`,a.photo):""}
+    </div></div>`).join("")}
+    <button class="btn ghost" data-add="boutique.articles">+ Ajouter un article</button>`}
   if(tab==="affiliations"){d.affiliations=d.affiliations||[];return `<p class="help">Fédérations, ligues et partenaires officiels. Ils apparaissent sur la page Le club, sur l’accueil et en bas de chaque page. Utilisez les logos officiels fournis par chaque fédération (PNG de préférence).</p>
     ${d.affiliations.map((a,i)=>`<div class="item"><div class="item-head"><b>${esc(a.sigle||a.nom||"Nouvelle affiliation")}</b>${delBtn("affiliations",i)}</div><div class="fgrid">
       ${field("Sigle (nom court)",`affiliations.${i}.sigle`,a.sigle,{ph:"FFKMDA"})}${field("Lien du site officiel",`affiliations.${i}.url`,a.url,{type:"url",ph:"https://…"})}
@@ -1028,6 +1188,8 @@ function renderAdmin(){
     <div class="admin-body"><div class="wrap">${adminTab()}</div></div></div>`;
   root.querySelector(".admin-body").scrollTop=scroll;
 }
+const getPath=(obj,path)=>path.split(".").reduce((o,k)=>o==null?o:o[k],obj);
+const D0=()=>DATA;
 function setPath(obj,path,val){const k=path.split(".");let o=obj;for(let i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=val}
 function markDirty(){if(!dirty){dirty=true;const b=document.querySelector(".admin-bar");if(b)renderAdmin()}}
 
@@ -1099,12 +1261,13 @@ async function handleFiles(files,onDone){
   if(!uploading) toast("Photo(s) ajoutée(s). Enregistrez pour publier.");
 }
 
-const BLANK={planning:()=>({id:uid(),jour:0,debut:"18:00",fin:"19:00",cours:"",public:"Adultes",coach:"",exemple:false}),
+const BLANK={"boutique.articles":()=>({id:uid(),nom:"",description:"",photo:"",prixAdh:"",prixPub:"",tailles:"S,M,L,XL",dispo:true}),planning:()=>({id:uid(),jour:0,debut:"18:00",fin:"19:00",cours:"",public:"Adultes",coach:"",exemple:false}),
   tarifs:()=>({id:uid(),formule:"",prix:"",detail:""}),documents:()=>"",
   actus:()=>({id:uid(),date:new Date().toISOString().slice(0,10),titre:"",texte:""}),coachs:()=>({id:uid(),nom:"",role:"",bio:"",photo:""}),affiliations:()=>({id:uid(),sigle:"",nom:"",texte:"",url:"",logo:""}),galerie:()=>({id:uid(),src:"",legende:""}),agenda:()=>({id:uid(),date:"",heure:"",titre:"",lieu:"",description:""})};
 
 document.addEventListener("click",e=>{
   const tl=e.target.closest("a[data-type]"); if(tl){e.preventDefault();if(menuOpen)setMenu(false);goForm(tl.dataset.type);return}
+  const cg=e.target.closest("a[data-cartgo]"); if(cg){e.preventDefault();document.getElementById("panier")?.scrollIntoView({behavior:RM()?"auto":"smooth"});return}
   const nl=e.target.closest("a[data-nav]"); if(nl){e.preventDefault();go(nl.dataset.nav);return}
   const el=e.target.closest("button,[data-filter]"); if(!el) return;
   if(el.dataset.filter){filter=el.dataset.filter;render();return}
@@ -1113,6 +1276,14 @@ document.addEventListener("click",e=>{
   if(el.dataset.try){const s=DATA.planning.find(x=>x.id===el.dataset.try);if(s&&s.public==="Enfants"){FORM.pour="Mon enfant"}goForm("essai",s?s.cours:"");return}
   if(el.id==="form-new"){FORM.status="idle";FORM.message="";refreshForm();return}
   if(el.dataset.zoom!==undefined){openLightbox(+el.dataset.zoom);return}
+  if(el.dataset.addcart){const id=el.dataset.addcart,sz=document.getElementById("sz-"+id),qt=document.getElementById("qt-"+id);
+    const taille=(sz&&sz.value)||"";if(sz&&sz.tagName==="SELECT"&&!taille){sz.focus();toast("Choisissez une taille.");return}
+    const q=Math.max(1,Math.min(20,parseInt(qt&&qt.value,10)||1));const ex=CART.find(l=>l.aid===id&&l.taille===taille);
+    if(ex)ex.qty=Math.min(50,ex.qty+q);else CART.push({aid:id,taille,qty:q});saveCart();if(ORDER.status==="sent")ORDER.status="idle";refreshCart();
+    const a=DATA.boutique.articles.find(x=>x.id===id);toast(`${q} × ${a?a.nom:"article"}${taille?" ("+taille+")":""} ajouté au panier.`);return}
+  if(el.dataset.cartqty){const [i,d]=el.dataset.cartqty.split(":").map(Number);CART[i].qty+=d;if(CART[i].qty<1)CART.splice(i,1);saveCart();refreshCart();return}
+  if(el.dataset.cartdel!==undefined){CART.splice(+el.dataset.cartdel,1);saveCart();refreshCart();return}
+  if(el.id==="order-new"){ORDER.status="idle";ORDER.message="";refreshCart();return}
   if(el.id==="tt-add"&&draft){const inp=document.getElementById("tt-url");const url=(inp.value||"").trim();
     if(!/^https?:\/\/([a-z]+\.)?tiktok\.com\//i.test(url)){toast("Collez un lien TikTok qui commence par https://www.tiktok.com/ ou https://vm.tiktok.com/");inp.focus();return}
     draft.galerie=draft.galerie||[];draft.galerie.unshift({id:uid(),type:"tiktok",url,legende:""});dirty=true;renderAdmin();hydrateTT();
@@ -1135,14 +1306,16 @@ document.addEventListener("click",e=>{
   if(el.id==="close-admin"){draft=null;dirty=false;confirmDel=null;if(location.hash==="#bureau")history.replaceState(null,"",page==="accueil"?location.pathname+location.search:"#"+page);renderAdmin();return}
   if(el.id==="save-admin"){save();return}
   if(el.dataset.tab){tab=el.dataset.tab;confirmDel=null;renderAdmin();return}
-  if(el.dataset.add){const l=el.dataset.add;const it=BLANK[l]();l==="actus"||l==="agenda"?draft[l].unshift(it):draft[l].push(it);dirty=true;renderAdmin();return}
+  if(el.dataset.add){const l=el.dataset.add;const it=BLANK[l]();const arr=getPath(draft,l);l==="actus"||l==="agenda"?arr.unshift(it):arr.push(it);dirty=true;renderAdmin();return}
   if(el.dataset.askDel){confirmDel=el.dataset.askDel;renderAdmin();return}
   if(el.dataset.cancelDel!==undefined){confirmDel=null;renderAdmin();return}
-  if(el.dataset.del){const [l,i]=el.dataset.del.split(":");draft[l].splice(+i,1);confirmDel=null;dirty=true;renderAdmin();return}
+  if(el.dataset.amove){const [i,d]=el.dataset.amove.split(":").map(Number);const A=draft.boutique.articles;[A[i],A[i+d]]=[A[i+d],A[i]];dirty=true;renderAdmin();return}
+  if(el.dataset.del){const [l,i]=el.dataset.del.split(":");getPath(draft,l).splice(+i,1);confirmDel=null;dirty=true;renderAdmin();return}
 });
 function selectNear(el){const v=el.parentElement.querySelector(".val");if(!v)return;const r=document.createRange();r.selectNodeContents(v);const s=getSelection();s.removeAllRanges();s.addRange(r)}
-document.addEventListener("submit",e=>{if(e.target.id==="ask-form"){e.preventDefault();sendForm()}});
+document.addEventListener("submit",e=>{if(e.target.id==="ask-form"){e.preventDefault();sendForm()}if(e.target.id==="order-form"){e.preventDefault();sendOrder()}});
 document.addEventListener("input",e=>{
+  {const t=e.target;if(t.dataset&&t.dataset.order){const k=t.dataset.order;ORDER[k]=t.type==="checkbox"?t.checked:t.value;if(k==="statut")refreshCart();return}}
   const t=e.target;
   if(t.dataset&&t.dataset.form){const k=t.dataset.form;FORM[k]=t.type==="checkbox"?t.checked:t.value;if(k==="type"||k==="pour")refreshForm();return} if(!draft||!t.dataset||!t.dataset.path) return;
   let v=t.dataset.bool?t.checked:t.value; if(t.dataset.num) v=+v;
