@@ -323,6 +323,22 @@ footer a{color:var(--muted)}
 .cta-band p{color:var(--muted);margin:0;max-width:52ch}
 .app-band{background:var(--bg-2)!important}
 .cta-band{background:radial-gradient(ellipse 50% 90% at 85% 50%,color-mix(in srgb,var(--gold) 16%,transparent),transparent 70%),var(--bg)}
+.vposter{position:relative;display:block;width:100%;aspect-ratio:16/9;background:radial-gradient(circle at 50% 45%,#2a1f10,#0d0b09 70%);overflow:hidden}
+.slide .vposter{aspect-ratio:16/9}
+@media (max-width:640px){.slide .vposter{aspect-ratio:4/3}}
+.thumbs .vposter{aspect-ratio:1}
+.vposter img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vposter img.vlogo{object-fit:contain;padding:14%;opacity:.35}
+.vposter .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:rgba(224,176,74,.92);color:#1a1206;display:grid;place-items:center;font-size:26px;padding-left:5px;box-shadow:0 0 0 8px rgba(224,176,74,.25),0 10px 30px rgba(0,0,0,.6);transition:transform .2s}
+.thumbs .vposter .play{width:38px;height:38px;font-size:15px;padding-left:3px;box-shadow:0 0 0 4px rgba(224,176,74,.25)}
+button:hover > .vposter .play{transform:translate(-50%,-50%) scale(1.08)}
+.vposter .vtag{position:absolute;top:10px;left:10px;font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;background:rgba(0,0,0,.7);color:#f3ece0;padding:4px 8px;border-radius:4px}
+.thumbs .vposter .vtag{display:none}
+.lb-video{width:min(420px,92vw);height:min(80vh,calc(92vw * 16 / 9));border-radius:12px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lb-video iframe{width:100%;height:100%;border:0;display:block}
+.lightbox .btn{cursor:pointer}
+.tt-add{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;padding:14px;border:1px dashed var(--line);border-radius:var(--r)}
+.tt-add label{flex:1 1 260px}
 .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:22px}
 .thumbs button{all:unset;cursor:zoom-in;border-radius:8px;overflow:hidden;border:1px solid var(--line);display:block}
 .thumbs button:focus-visible{outline:2px solid var(--gold-2);outline-offset:2px}
@@ -504,7 +520,7 @@ function legalHTML(){
   <p>Elles sont conservées au plus tard 3 ans après le dernier contact, sauf si vous devenez adhérent : les données d’adhésion sont alors conservées pendant la durée de l’adhésion.</p>
   <p>Conformément au RGPD, vous pouvez accéder à vos données, les faire rectifier ou supprimer, ou vous opposer à leur traitement en écrivant à ${esc(c.email)}. Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).</p>
   <h3>Cookies et services tiers</h3>
-  <p>Ce site ne dépose aucun cookie publicitaire ni de mesure d’audience. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet votre adresse IP à Google. Les liens WhatsApp, Facebook, TikTok, Instagram et Google Maps ouvrent des services tiers soumis à leurs propres conditions.</p>
+  <p>Ce site ne dépose aucun cookie publicitaire ni de mesure d’audience. Les vidéos TikTok de la galerie ne se chargent que lorsque vous appuyez dessus ; TikTok peut alors déposer ses propres cookies. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet votre adresse IP à Google. Les liens WhatsApp, Facebook, TikTok, Instagram et Google Maps ouvrent des services tiers soumis à leurs propres conditions.</p>
   <h3>Droit à l’image</h3>
   <p>Les photos publiées sont prises lors des activités du club. Toute personne qui souhaite le retrait d’une photo où elle apparaît, ou où apparaît son enfant, peut le demander à ${esc(c.email)} : elle sera retirée rapidement.</p>
   <h3>Propriété</h3>
@@ -614,6 +630,20 @@ function slSchedule(){
   if(run) SL.timer=setTimeout(()=>slGo(SL.i+1),SL.dur);
 }
 document.addEventListener("visibilitychange",slSchedule);
+const ttId=u=>{const m=String(u||"").match(/(?:video|v|embed\/v2|player\/v1)\/(\d{8,})/);return m?m[1]:""};
+const TTT={};
+function mediaHTML(g,lazy){
+  if(g.type!=="tiktok") return `<img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}"${lazy?' loading="lazy"':""}>`;
+  const th=TTT[g.url];
+  return `<span class="vposter" data-tt-url="${esc(g.url)}">${th?`<img src="${esc(th)}" alt="" loading="lazy">`:`<img class="vlogo" src="${IMG.logo}" alt="">`}<span class="vtag">▶ Vidéo</span><i class="play" aria-hidden="true">▶</i></span>`;
+}
+async function hydrateTT(){
+  const els=[...document.querySelectorAll("[data-tt-url]")];
+  for(const url of [...new Set(els.map(e=>e.dataset.ttUrl))]){
+    if(TTT[url]===undefined){TTT[url]=null;try{const r=await fetch("https://www.tiktok.com/oembed?url="+encodeURIComponent(url));if(r.ok){const j=await r.json();if(j.thumbnail_url)TTT[url]=j.thumbnail_url}}catch(_){}}
+    if(TTT[url]) document.querySelectorAll(`[data-tt-url="${CSS.escape(url)}"]`).forEach(e=>{const im=e.querySelector("img");if(im&&im.classList.contains("vlogo")){im.classList.remove("vlogo");im.src=TTT[url]}});
+  }
+}
 let lbI=0;
 function openLightbox(i){
   const G=DATA.galerie||[];if(!G.length) return;
@@ -623,7 +653,11 @@ function openLightbox(i){
     lb.addEventListener("click",e=>{if(e.target===lb||e.target.tagName==="IMG")closeLightbox()});
     let x0=null;lb.addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
     lb.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)openLightbox(lbI+(dx<0?1:-1));x0=null},{passive:true});}
-  lb.innerHTML=`<img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}">${g.legende?`<p>${esc(g.legende)}</p>`:""}${G.length>1?`<span class="lb-count">${lbI+1} / ${G.length}</span><button class="lb-btn lb-prev" data-lb="-1" aria-label="Photo précédente">‹</button><button class="lb-btn lb-next" data-lb="1" aria-label="Photo suivante">›</button>`:""}<button class="lb-close" id="lb-close" aria-label="Fermer">×</button>`;
+  const vid=g.type==="tiktok"?ttId(g.url):"";
+  const media=g.type!=="tiktok"?`<img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}">`
+    :vid?`<div class="lb-video"><iframe src="https://www.tiktok.com/player/v1/${vid}?autoplay=1&amp;loop=1&amp;music_info=1&amp;description=0&amp;rel=0" title="${esc(g.legende||"Vidéo du club")}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><a class="btn ghost sm" href="${esc(g.url)}" target="_blank" rel="noopener">Ouvrir dans TikTok</a>`
+    :`<a class="btn" href="${esc(g.url)}" target="_blank" rel="noopener">▶ Voir la vidéo sur TikTok</a>`;
+  lb.innerHTML=`${media}${g.legende?`<p>${esc(g.legende)}</p>`:""}${G.length>1?`<span class="lb-count">${lbI+1} / ${G.length}</span><button class="lb-btn lb-prev" data-lb="-1" aria-label="Photo précédente">‹</button><button class="lb-btn lb-next" data-lb="1" aria-label="Photo suivante">›</button>`:""}<button class="lb-close" id="lb-close" aria-label="Fermer">×</button>`;
   document.getElementById("lb-close").focus({preventScroll:true});
   document.body.style.overflow="hidden";slSchedule();
 }
@@ -687,7 +721,7 @@ ${actus.length?`<section class="band"><div class="wrap">
 ${G.length?`<section class="band alt"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><a class="btn ghost sm" href="#photos" data-nav="photos">Toutes les photos →</a></div>
   <div class="slider" id="slider" role="region" aria-roledescription="carrousel" aria-label="Photos du club">
-    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="Agrandir la photo${g.legende?" : "+esc(g.legende):""}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" ${i>1?'loading="lazy"':""}></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
+    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="${g.type==="tiktok"?"Lire la vidéo":"Agrandir la photo"}${g.legende?" : "+esc(g.legende):""}">${mediaHTML(g,i>1)}</button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
     ${D.galerie.length>1?`<button class="sl-btn sl-prev" data-sl="-1" aria-label="Photo précédente">‹</button><button class="sl-btn sl-next" data-sl="1" aria-label="Photo suivante">›</button><div class="sl-progress" id="sl-progress"></div>`:""}
   </div>
   ${D.galerie.length>1?`<div class="sl-bar">
@@ -764,7 +798,7 @@ ${D.coachs.length?`<section class="band alt" id="coachs"><div class="wrap">
     photos:()=>`<section class="band" id="photos"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">En images</div><h2>Photos du club</h2></div><p>Entraînements, galas et moments de vie du club.</p></div>
   ${G.length?`  <div class="slider" id="slider" role="region" aria-roledescription="carrousel" aria-label="Photos du club">
-    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="Agrandir la photo${g.legende?" : "+esc(g.legende):""}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" ${i>1?'loading="lazy"':""}></button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
+    <div class="slides" id="slides">${D.galerie.map((g,i)=>`<figure class="slide" role="group" aria-roledescription="photo" aria-label="${i+1} sur ${D.galerie.length}"><button data-zoom="${i}" aria-label="${g.type==="tiktok"?"Lire la vidéo":"Agrandir la photo"}${g.legende?" : "+esc(g.legende):""}">${mediaHTML(g,i>1)}</button>${g.legende?`<figcaption>${esc(g.legende)}</figcaption>`:""}</figure>`).join("")}</div>
     ${D.galerie.length>1?`<button class="sl-btn sl-prev" data-sl="-1" aria-label="Photo précédente">‹</button><button class="sl-btn sl-next" data-sl="1" aria-label="Photo suivante">›</button><div class="sl-progress" id="sl-progress"></div>`:""}
   </div>
   ${D.galerie.length>1?`<div class="sl-bar">
@@ -772,7 +806,7 @@ ${D.coachs.length?`<section class="band alt" id="coachs"><div class="wrap">
     <button class="btn ghost sm" id="sl-play" aria-pressed="false">Pause</button>
     <span class="sl-count" id="sl-count">1 / ${D.galerie.length}</span>
   </div>`:""}
-  <div class="thumbs">${G.map((g,i)=>`<button data-zoom="${i}" aria-label="Agrandir la photo ${i+1}"><img src="${esc(imgSrc(g.src))}" alt="${esc(g.legende||"Photo du club")}" loading="lazy"></button>`).join("")}</div>`:`<div class="empty"><b>Bientôt des photos</b>Les photos des entraînements et des galas arriveront ici.</div>`}
+  <div class="thumbs">${G.map((g,i)=>`<button data-zoom="${i}" aria-label="${g.type==="tiktok"?"Lire la vidéo":"Agrandir la photo"} ${i+1}">${mediaHTML(g,true)}</button>`).join("")}</div>`:`<div class="empty"><b>Bientôt des photos</b>Les photos des entraînements et des galas arriveront ici.</div>`}
 </div></section>`,
     contact:()=>`<section class="band alt" id="contact"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Contact &amp; accès</div><h2>Venir au club</h2></div></div>
@@ -826,7 +860,7 @@ ${showAn?`<div class="annonce${an.type==="alerte"?" alerte":""}" role="status"><
 </div></footer>
 ${canWrite?`<button class="btn fab" id="open-admin">Gérer le site</button>`:""}
 <div id="admin-root"></div>`;
-  initSlider();initSpy();
+  initSlider();initSpy();hydrateTT();
   if(draft) renderAdmin();
 }
 
@@ -897,10 +931,11 @@ function adminTab(){
     <button class="btn ghost" data-add="documents">+ Ajouter un document</button>
     <div class="fgrid" style="margin-top:20px">${field("Cours d’essai",`essai`,d.essai,{type:"textarea",full:1})}</div>`;
   if(tab==="galerie"){ if(!d.galerie) d.galerie=[];
-    return `<p class="help">Les photos sont réduites automatiquement avant l’envoi. Choisissez-en plusieurs d’un coup si besoin. Pensez à l’accord des parents pour les photos d’enfants.</p>
+    return `<p class="help">Les photos sont réduites automatiquement avant l’envoi. Choisissez-en plusieurs d’un coup si besoin. Vous pouvez aussi ajouter des vidéos TikTok : elles se mélangent aux photos dans la galerie. Pensez à l’accord des parents pour les photos et vidéos d’enfants.</p>
     ${GH.token?`<span class="btn ghost file-btn" style="margin-bottom:14px">+ Ajouter des photos<input type="file" accept="image/*" multiple data-gal-add="1" aria-label="Ajouter des photos"></span>`:'<p class="notice">Connectez-vous d’abord dans l’onglet Connexion pour envoyer des photos.</p>'}
+    <div class="tt-add"><label class="f" for="tt-url">Ajouter une vidéo TikTok : collez le lien<input id="tt-url" type="url" placeholder="https://www.tiktok.com/@montoiz…/video/123…" autocomplete="off"></label><button class="btn sm" id="tt-add">+ Ajouter la vidéo</button></div>
     ${uploading?`<p class="help">Envoi en cours : ${uploading} photo(s)…</p>`:""}
-    ${d.galerie.map((g,i)=>`<div class="item gal-item"><img src="${esc(imgSrc(g.src))}" alt=""><div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+    ${d.galerie.map((g,i)=>`<div class="item gal-item">${g.type==="tiktok"?`<div>${mediaHTML(g,false)}<p class="help" style="margin:6px 0 0;font-size:12px">${ttId(g.url)?"✓ Vidéo lue dans le site":"Lien court : s’ouvre sur TikTok"}</p></div>`:`<img src="${esc(imgSrc(g.src))}" alt="">`}<div style="display:flex;flex-direction:column;gap:8px;min-width:0">
       ${field("Légende (facultatif)",`galerie.${i}.legende`,g.legende||"",{ph:"Entraînement enfants, gala…"})}
       <div style="display:flex;gap:6px;flex-wrap:wrap">${i>0?`<button class="btn ghost sm" data-move="${i}:-1">↑ Monter</button>`:""}${i<d.galerie.length-1?`<button class="btn ghost sm" data-move="${i}:1">↓ Descendre</button>`:""}${delBtn("galerie",i)}</div>
     </div></div>`).join("")}`;}
@@ -1029,6 +1064,10 @@ document.addEventListener("click",e=>{
   if(el.dataset.try){const s=DATA.planning.find(x=>x.id===el.dataset.try);if(s&&s.public==="Enfants"){FORM.pour="Mon enfant"}goForm("essai",s?s.cours:"");return}
   if(el.id==="form-new"){FORM.status="idle";FORM.message="";refreshForm();return}
   if(el.dataset.zoom!==undefined){openLightbox(+el.dataset.zoom);return}
+  if(el.id==="tt-add"&&draft){const inp=document.getElementById("tt-url");const url=(inp.value||"").trim();
+    if(!/^https?:\/\/([a-z]+\.)?tiktok\.com\//i.test(url)){toast("Collez un lien TikTok qui commence par https://www.tiktok.com/ ou https://vm.tiktok.com/");inp.focus();return}
+    draft.galerie=draft.galerie||[];draft.galerie.unshift({id:uid(),type:"tiktok",url,legende:""});dirty=true;renderAdmin();hydrateTT();
+    toast(ttId(url)?"Vidéo ajoutée en tête de galerie. Enregistrez pour publier.":"Lien court ajouté : la vidéo s’ouvrira sur TikTok. Pour la lire dans le site, ouvrez le lien et copiez l’adresse complète.");return}
   if(el.dataset.lb){openLightbox(lbI+ +el.dataset.lb);return}
   if(el.id==="lb-close"){closeLightbox();return}
   if(el.dataset.sl){slGo(SL.i+ +el.dataset.sl);return}
