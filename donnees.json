@@ -131,11 +131,77 @@
       "id": "ss70wp9",
       "src": "photos/2026-10-21-09jkxrt.jpg",
       "legende": ""
+    },
+    {
+      "id": "fdvxoxx",
+      "src": "photos/2026-10-22-03c2gxc.jpg",
+      "legende": ""
+    },
+    {
+      "id": "bpugd91",
+      "src": "photos/2026-10-22-hcd9hwp.jpg",
+      "legende": ""
+    },
+    {
+      "id": "xpocxzx",
+      "src": "photos/2026-10-22-ajca4xh.jpg",
+      "legende": ""
+    },
+    {
+      "id": "h6436w0",
+      "src": "photos/2026-10-22-sz3timw.jpg",
+      "legende": ""
+    },
+    {
+      "id": "qotlp9t",
+      "src": "photos/2026-10-22-tkhv40t.jpg",
+      "legende": ""
+    },
+    {
+      "id": "94ji84m",
+      "src": "photos/2026-10-22-ovvr9kx.jpg",
+      "legende": ""
+    },
+    {
+      "id": "z3kfceq",
+      "src": "photos/2026-10-22-wvpom8h.jpg",
+      "legende": ""
+    },
+    {
+      "id": "2p6y6tt",
+      "src": "photos/2026-10-22-b8qabe9.jpg",
+      "legende": ""
+    },
+    {
+      "id": "z76kb0d",
+      "src": "photos/2026-10-22-7gtkc1z.jpg",
+      "legende": ""
+    },
+    {
+      "id": "oe8ub1c",
+      "src": "photos/2026-10-22-t19aagy.jpg",
+      "legende": ""
+    },
+    {
+      "id": "h9jm3jo",
+      "src": "photos/2026-10-22-wng8qi3.jpg",
+      "legende": ""
+    },
+    {
+      "id": "aarrmov",
+      "src": "photos/2026-10-22-uxhsonl.jpg",
+      "legende": ""
+    },
+    {
+      "id": "pmdvy4z",
+      "src": "photos/2026-10-22-osjmnzd.jpg",
+      "legende": ""
     }
   ],
   "seeds": [
     "affil-2026",
-    "boutique-2026"
+    "boutique-2026",
+    "mirabel-2026"
   ],
   "affiliations": [
     {
@@ -212,6 +278,16 @@
         "tailles": "Taille unique",
         "dispo": true
       }
-    ]
+    ],
+    "atelier": {
+      "nom": "Atelier Mirabel",
+      "logo": "builtin:mirabel",
+      "texte": "Les textiles du club sont fabriqués par Atelier Mirabel, atelier drômois installé à Valence. Un choix fait pour soutenir le savoir-faire local.",
+      "tel": "04 65 84 43 48",
+      "email": "contact@ateliermirabel.fr",
+      "adresse": "2 rue Mirabel Chambaud, 26000 Valence",
+      "horaires": "Lundi–vendredi, 8h–18h sur rendez-vous",
+      "url": ""
+    }
   }
 }
